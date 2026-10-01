@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>로그인 · KPC HR SYSTEM</title>
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/css/app.css">
+<style>
+  body{background:#070a1a;color:#e8ebf2;overflow:hidden}
+  #scene{position:fixed;inset:0;width:100%;height:100%}
+  .aurora{position:fixed;inset:-20%;background:radial-gradient(40% 40% at 20% 30%,color-mix(in oklab,var(--brand) 55%,transparent),transparent 70%),
+    radial-gradient(35% 35% at 80% 70%,rgba(139,92,246,.45),transparent 70%),radial-gradient(30% 30% at 60% 10%,rgba(34,211,238,.25),transparent 70%);filter:blur(40px);animation:float 14s ease-in-out infinite;pointer-events:none}
+  .login{position:relative;z-index:2;min-height:100vh;display:grid;grid-template-columns:1.2fr minmax(360px,440px);align-items:center;gap:40px;padding:40px clamp(20px,6vw,90px)}
+  .pitch h1{font-size:clamp(34px,4.6vw,60px);line-height:1.08;font-weight:900;letter-spacing:-.04em;margin:18px 0 14px}
+  .pitch h1 span{background:linear-gradient(90deg,#fff,#a5b4fc 40%,#67e8f9);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .pitch p{font-size:17px;color:#b6bfd6;max-width:520px;margin:0}
+  .pill{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);font-weight:700;font-size:13px;backdrop-filter:blur(8px)}
+  .feats{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}
+  .feats span{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);font-size:13px;color:#cfd6e8}
+  .panel{background:rgba(15,19,38,.62);border:1px solid rgba(255,255,255,.12);border-radius:26px;padding:34px;backdrop-filter:blur(22px) saturate(1.4);
+    box-shadow:0 40px 90px -30px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.08);animation:pop .7s var(--ease) both;transform-style:preserve-3d}
+  .panel h2{font-size:24px;font-weight:800;margin:14px 0 4px}
+  .panel .muted{color:#9aa4bd}
+  .panel .input{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14);color:#fff;height:48px;border-radius:14px}
+  .panel .input::placeholder{color:#7d87a3}
+  .panel .field>label{color:#c9d1e6}
+  .panel .btn.primary{height:50px;border-radius:14px;font-size:15px;width:100%}
+  .pw{position:relative}.pw button{position:absolute;right:8px;top:8px;border:0;background:none;color:#9aa4bd;cursor:pointer;padding:8px}
+  .demo{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .demo button{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);
+    color:#e8ebf2;cursor:pointer;text-align:left;transition:all .2s var(--ease)}
+  .demo button:hover{transform:translateY(-3px);border-color:var(--brand);background:color-mix(in oklab,var(--brand) 22%,transparent)}
+  .demo b{font-size:13px}.demo small{color:#9aa4bd;font-size:11px}
+  .divider{display:flex;align-items:center;gap:10px;color:#7d87a3;font-size:12px;margin:22px 0 12px}
+  .divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.12)}
+  .shake{animation:shake .45s}
+  @keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+  .err{color:#fca5a5;font-size:13px;min-height:18px}
+  .foot{display:flex;justify-content:space-between;margin-top:18px;font-size:12px;color:#7d87a3}
+  .foot a:hover{color:#fff}
+  @media (max-width:900px){body{overflow:auto}.login{grid-template-columns:1fr}.pitch{text-align:center}.pitch p{margin:auto}.feats{justify-content:center}}
+</style>
+<script src="/static/vendor/lucide.min.js" defer></script>
+<script type="module" src="/static/js/login.js"></script>
+</head>
+<body>
+<div class="aurora"></div>
+<canvas id="scene" aria-hidden="true"></canvas>
+<main class="login">
+  <section class="pitch">
+    <span class="pill"><span class="pulse"></span><span id="brandName">KPC HR SYSTEM</span></span>
+    <h1><span id="title">성과가 연결되는 순간,</span><br>평가가 성장이 됩니다.</h1>
+    <p id="sub">목표·평가·성장을 하나의 흐름으로 관리하는 KPC 성과평가 플랫폼</p>
+    <div class="feats">
+      <span><i data-lucide="target"></i>KPI 연결 목표</span><span><i data-lucide="scale"></i>3영역 100점 산정</span>
+      <span><i data-lucide="users"></i>익명 360° 리뷰</span><span><i data-lucide="layout-template"></i>드래그앤드롭 UI</span>
+    </div>
+  </section>
+  <section class="panel" id="panel">
+    <span class="orb" style="display:block"></span>
+    <h2>로그인</h2>
+    <p class="muted" style="margin:0 0 22px">사번 또는 이메일로 로그인하세요. 역할에 맞는 화면으로 이동합니다.</p>
+    <form id="form" class="col" autocomplete="on">
+      <div class="field"><label for="login">사번 또는 이메일</label><input class="input" id="login" name="login" autocomplete="username" required placeholder="KPC0001 또는 name@kpc.demo"></div>
+      <div class="field"><label for="password">비밀번호</label><div class="pw"><input class="input" id="password" name="password" type="password" autocomplete="current-password" required placeholder="••••••••">
+        <button type="button" id="eye" aria-label="비밀번호 보기"><i data-lucide="eye"></i></button></div><span class="hint" id="caps" hidden style="color:#fcd34d">Caps Lock이 켜져 있습니다</span></div>
+      <label class="row small muted"><input type="checkbox" id="remember" style="accent-color:var(--brand)"> 아이디 기억하기</label>
+      <div class="err" id="err" role="alert"></div>
+      <button class="btn primary" id="submit" type="submit"><i data-lucide="log-in"></i>로그인</button>
+    </form>
+    <div id="demoBox">
+      <div class="divider">데모 계정으로 바로 체험</div>
+      <div class="demo">
+        <button type="button" data-demo="admin"><i data-lucide="shield-check"></i><b>관리자</b><small>HR · 김하늘</small></button>
+        <button type="button" data-demo="leader"><i data-lucide="clipboard-pen"></i><b>평가자</b><small>팀장 · 박서준</small></button>
+        <button type="button" data-demo="member"><i data-lucide="user-round"></i><b>피평가자</b><small>대리 · 최유나</small></button>
+      </div>
+    </div>
+    <div class="foot"><a href="/manual" target="_blank">사용 매뉴얼</a><span>© KPC HR SYSTEM</span></div>
+  </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>사용 매뉴얼 · KPC HR SYSTEM</title>
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/css/app.css">
+<style>
+  .m-hero{position:relative;overflow:hidden;padding:64px clamp(16px,6vw,80px) 48px;color:#fff;background:radial-gradient(120% 140% at 0% 0%,#4f6bff 0%,var(--brand) 35%,#1e1b4b 100%)}
+  .m-hero h1{font-size:clamp(28px,4vw,46px);font-weight:900;letter-spacing:-.03em;margin:14px 0 10px}
+  .m-hero p{max-width:640px;opacity:.85;margin:0 0 22px;font-size:16px}
+  .m-hero .input{max-width:520px;height:50px;border-radius:16px;background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25);color:#fff;font-size:15px}
+  .m-hero .input::placeholder{color:rgba(255,255,255,.7)}
+  .m-top{position:absolute;top:18px;right:clamp(16px,6vw,80px);display:flex;gap:8px}
+  .m-top .btn{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25);color:#fff}
+  .m-wrap{display:grid;grid-template-columns:240px minmax(0,1fr);gap:36px;max-width:1240px;margin:0 auto;padding:28px clamp(16px,4vw,40px) 120px}
+  .m-toc{position:sticky;top:20px;align-self:start;display:flex;flex-direction:column;gap:2px;max-height:calc(100vh - 40px);overflow:auto}
+  .m-toc a{padding:8px 12px;border-radius:10px;color:var(--muted);font-weight:600;font-size:13px;border-left:3px solid transparent}
+  .m-toc a.on{color:var(--brand);background:var(--brand-soft);border-left-color:var(--brand)}
+  .m-sec{margin-bottom:56px;scroll-margin-top:20px;opacity:0;transform:translateY(18px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+  .m-sec.in{opacity:1;transform:none}
+  .m-sec[hidden]{display:none}
+  .m-sec h2{font-size:24px;font-weight:800;margin:0 0 14px;display:flex;align-items:center;gap:10px}
+  .m-sec h2 .n{font-size:13px;color:var(--brand);background:var(--brand-soft);border-radius:8px;padding:3px 8px}
+  .m-sec h3{font-size:16px;margin:22px 0 8px}
+  .m-sec p,.m-sec li{color:var(--ink-2);line-height:1.75}
+  .roles{display:flex;gap:6px;margin-left:auto}
+  .rtag{font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;background:var(--surface-3);color:var(--muted)}
+  .flow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;margin:16px 0}
+  .flow .card{padding:14px;text-align:center}
+  .flow .card .num{display:grid;place-items:center;width:30px;height:30px;margin:0 auto 8px;border-radius:50%;background:var(--brand);color:#fff;font-weight:800}
+  .formula{background:#0f172a;color:#e2e8f0;padding:14px 18px;border-radius:12px;font-family:Consolas,monospace;font-size:13px;margin:10px 0 16px;overflow-x:auto}
+  .formula b{color:#fbbf24}
+  .gbar{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin:12px 0;text-align:center;color:#fff;font-weight:800}
+  .gbar div{padding:12px 6px;border-radius:10px}
+  .sim input[type=range]{width:100%;accent-color:var(--brand)}
+  .shot{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--surface-2);font-size:13px}
+  details.faq{border-bottom:1px solid var(--line);padding:14px 4px}
+  details.faq summary{font-weight:700;cursor:pointer;list-style:none;display:flex;gap:8px}
+  details.faq summary::before{content:'Q';color:var(--brand);font-weight:900}
+  details.faq p{margin:8px 0 0 20px}
+  mark{background:color-mix(in oklab,var(--warn) 45%,transparent);color:inherit;border-radius:4px}
+  @media (max-width:900px){.m-wrap{grid-template-columns:1fr}.m-toc{display:none}.flow{grid-template-columns:repeat(2,1fr)}}
+  @media print{.m-hero{color:#000;background:none;padding:20px 0}.m-top,.m-toc,.m-hero .input,.seg{display:none}.m-wrap{display:block}.m-sec{opacity:1;transform:none}}
+</style>
+<script src="/static/vendor/lucide.min.js" defer></script>
+<script type="module" src="/static/js/manual.js"></script>
+</head>
+<body>
+<header class="m-hero">
+  <span class="hero-blob" style="width:300px;height:300px;right:-60px;top:-80px;background:#22d3ee"></span>
+  <span class="hero-blob" style="width:220px;height:220px;right:260px;bottom:-120px;background:#a78bfa;animation-delay:-4s"></span>
+  <div class="m-top"><button class="btn sm" id="theme"><i data-lucide="sun-moon"></i>테마</button><button class="btn sm" id="printBtn"><i data-lucide="printer"></i>인쇄·PDF</button><a class="btn sm" href="/login"><i data-lucide="log-in"></i>로그인</a></div>
+  <div style="position:relative">
+    <span class="pill" style="display:inline-flex;gap:8px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.14);font-weight:700;font-size:12px">KPC HR SYSTEM · 성과평가 매뉴얼 v2</span>
+    <h1>성과평가, 처음 보는 사람을 위한 안내서</h1>
+    <p>평가가 어떤 흐름으로 흘러가고, 내 점수가 어떻게 계산되고, 지금 어떤 화면에서 무엇을 해야 하는지 한 번에 알 수 있습니다.</p>
+    <input class="input" id="q" placeholder="무엇이 궁금하세요? 예: 가중치, 조정, 다면평가, 재작성" aria-label="매뉴얼 검색">
+  </div>
+</header>
+<div class="m-wrap">
+  <nav class="m-toc" id="toc"></nav>
+  <main>
+    <div class="row wrap" style="margin-bottom:24px"><b>내 역할로 보기</b>
+      <div class="seg" id="roleSeg"><button data-r="all" class="on">전체</button><button data-r="me">피평가자</button><button data-r="review">평가자</button><button data-r="admin">관리자(HR)</button></div></div>
+
+    <section class="m-sec" id="intro" data-roles="all"><h2><span class="n">01</span>이 평가는 무엇을 위한 것인가</h2>
+      <p>조직이 세운 목표를 각자가 어느 정도 소화했는지, 그 과정에서 역량과 태도가 어떻게 드러났는지를 한 주기(보통 반년) 단위로 모아 등급으로 환산하는 체계입니다.</p>
+      <p>사람 평가 자체가 목적은 아닙니다. 다음 주기 목표를 더 잘 세우고, 보상·육성·배치를 결정할 때 쓸 공통 근거를 만드는 데 더 가깝습니다. 평가 데이터는 승진·연봉·교육 계획으로 연결되고, 과거 결과는 이력으로 남아 추세를 보여줍니다.</p>
+      <div class="callout tip"><i data-lucide="sparkles"></i><div><b>한 문장 요약</b> 조직 목표 → 개인 목표 → 실적 → 자기평가 → 평가자 평가 → 조정 → 확정 → 공개. 이 흐름이 반복됩니다.</div></div></section>
+
+    <section class="m-sec" id="roles" data-roles="all"><h2><span class="n">02</span>누가 참여하는가</h2>
+      <div class="grid g3">
+        <div class="card tilt"><span class="chip info plain">피평가자</span><h3>본인 · <a href="/app/me">/app/me</a></h3><p class="small">목표를 작성해 제출하고, 기간이 끝나면 실적을 입력하고 자기평가를 씁니다. 다면평가 리뷰어로 지정될 수도 있습니다.</p></div>
+        <div class="card tilt"><span class="chip info plain">평가자</span><h3>1차 · 2차 · <a href="/app/review">/app/review</a></h3><p class="small">1차는 직속 조직장으로 목표 승인과 1차 평가를 작성합니다. 2차는 상위 조직장으로 제출된 평가를 검토하고 ±10점 범위에서 조정합니다.</p></div>
+        <div class="card tilt"><span class="chip info plain">관리자</span><h3>HR · <a href="/app/admin">/app/admin</a></h3><p class="small">주기를 열고 닫고, 평가 관계를 지정하고, 조정·확정·공개를 진행합니다. 조직 KPI, 다면평가 리뷰어, 화면 구성(UI 스튜디오)도 관리합니다.</p></div></div>
+      <p>1차·2차 평가자는 조직도 기준으로 자동 배정됩니다. 소속 조직의 조직장이 1차, 그 상위 조직장이 2차가 기본 규칙이며 관리자가 사람별로 바꿀 수 있습니다. 평가자이면서 피평가자인 분은 상단의 <b>피평가자 | 평가자 | 관리자</b> 전환 버튼으로 화면을 오갑니다.</p></section>
+
+    <section class="m-sec" id="cycle" data-roles="all"><h2><span class="n">03</span>평가는 어떤 순서로 흘러가는가</h2>
+      <p>한 주기는 아래 단계로 나뉘고, 관리자가 <b>평가 주기</b> 화면에서 단계를 눌러 수동 전환합니다. 단계에 따라 각 화면에서 할 수 있는 작업과 홈의 ‘지금 할 일’이 바뀝니다.</p>
+      <div class="flow stagger">
+        <div class="card"><span class="num">1</span><b>준비</b><div class="small muted">규칙·항목·관계 확정</div></div>
+        <div class="card"><span class="num">2</span><b>목표 설정</b><div class="small muted">작성·제출 → 승인</div></div>
+        <div class="card"><span class="num">3</span><b>실적·자기평가</b><div class="small muted">실적 입력·자기평가</div></div>
+        <div class="card"><span class="num">4</span><b>평가 진행</b><div class="small muted">1차 작성 · 2차 검토</div></div>
+        <div class="card"><span class="num">5</span><b>조정·확정</b><div class="small muted">분포 조정·확정</div></div>
+        <div class="card"><span class="num">6</span><b>결과 공개</b><div class="small muted">등급·근거 공개</div></div>
+        <div class="card"><span class="num">7</span><b>종료</b><div class="small muted">이력 보존</div></div></div>
+      <div class="callout"><i data-lucide="info"></i>단계는 자동으로 넘어가지 않습니다. 전환 시 대상자 전원에게 알림이 발송됩니다.</div></section>
+
+    <section class="m-sec" id="scoring" data-roles="all"><h2><span class="n">04</span>점수는 어떻게 매겨지는가</h2>
+      <p>최종 점수는 100점 만점이며 세 영역을 비중대로 합산합니다.</p>
+      <h3>영역 1 · 공통목표 (조직 KPI 연결)</h3>
+      <p>정량 목표는 달성률(실적 ÷ 목표값, 상한 150%)이 아래 표로 자동 환산됩니다. 정성 목표는 평가자가 0~100점으로 직접 채점하며, 평가자가 수기로 넣은 점수는 자동 환산보다 우선합니다.</p>
+      <div class="table-wrap"><table class="table"><thead><tr><th>달성률</th><th>환산 점수</th><th>해설</th></tr></thead><tbody>
+        <tr><td>110% 이상</td><td class="b">100</td><td>목표를 크게 넘어섰습니다.</td></tr><tr><td>100% 이상</td><td class="b">90</td><td>목표 달성입니다.</td></tr>
+        <tr><td>90% 이상</td><td class="b">80</td><td>거의 달성에 가깝습니다.</td></tr><tr><td>80% 이상</td><td class="b">70</td><td>부족분이 적지 않습니다.</td></tr><tr><td>80% 미만</td><td class="b">60</td><td>목표에 많이 못 미쳤습니다.</td></tr></tbody></table></div>
+      <div class="formula">공통목표 점수 = Σ(목표별 점수 × 가중치) ÷ Σ가중치 &nbsp;<span style="color:#94a3b8">// 승인 목표 가중치 합계 100% 필요</span></div>
+      <h3>영역 2 · 개인역량</h3><p>평가자가 각 역량 항목(전문성·협업·소통·책임감·도전·혁신·고객지향)에 1~5점을 부여합니다.</p>
+      <div class="formula">개인역량 점수 = (역량 항목 평균) × <b>20</b></div>
+      <h3>영역 3 · 자기개발(팀원) 또는 조직관리(직책자)</h3><p>항목별 5점 척도, 평균 × 20으로 환산합니다.</p>
+      <h3>조정 (2차 평가자·HR)</h3><p>사유와 함께 1회 ±10점 범위에서 조정할 수 있고, 확정 전까지 누적됩니다. 최종 점수는 0~100점으로 자릅니다.</p>
+      <div class="card sim" id="sim" style="margin-top:18px"><div class="card-h"><i data-lucide="calculator"></i><h3 style="margin:0">점수 시뮬레이터</h3><div class="seg right" id="simScheme"><button data-s="member" class="on">팀원 40/40/20</button><button data-s="leader">직책자 50/30/20</button></div></div>
+        <div class="grid g2"><div class="col">
+          <label>공통목표 달성률 <b id="vRate">100%</b><input type="range" min="50" max="150" value="100" id="rate"></label>
+          <label>개인역량 평균 <b id="vComp">4.0</b><input type="range" min="1" max="5" step="0.1" value="4" id="comp"></label>
+          <label>자기개발·조직관리 평균 <b id="vExtra">4.0</b><input type="range" min="1" max="5" step="0.1" value="4" id="extra"></label>
+          <label>조정 합계 <b id="vAdj">0</b><input type="range" min="-10" max="10" step="0.5" value="0" id="adj"></label></div>
+          <div class="col" style="align-items:center;justify-content:center"><div id="simOut"></div></div></div></div></section>
+
+    <section class="m-sec" id="scheme" data-roles="all"><h2><span class="n">05</span>팀원 vs 직책자, 다른 배점</h2>
+      <div class="table-wrap"><table class="table"><thead><tr><th>영역</th><th>팀원</th><th>직책자</th><th>왜 다른가</th></tr></thead><tbody>
+        <tr><td>공통목표 (KPI)</td><td class="b">40%</td><td class="b">50%</td><td>직책자는 조직 KPI와 더 직접적으로 묶입니다.</td></tr>
+        <tr><td>개인역량</td><td class="b">40%</td><td class="b">30%</td><td>팀원 단계에서는 개인 역량 성장이 더 중요합니다.</td></tr>
+        <tr><td>자기개발 · 조직관리</td><td class="b">20%</td><td class="b">20%</td><td>역할에 맞게 영역 이름과 항목이 바뀝니다.</td></tr></tbody></table></div>
+      <div class="callout tip"><i data-lucide="user-check"></i><div><b>직책자 판정</b> 직책이 대표이사·본부장·그룹장·부서장·팀장·섹션장이면 자동 적용됩니다. 예외는 관리자가 <b>평가 관계 → 목록</b>의 ‘평가 스킴’ 열에서 수동 지정합니다.</div></div></section>
+
+    <section class="m-sec" id="kpi" data-roles="me admin"><h2><span class="n">06</span>조직 KPI와 개인 목표의 연결</h2>
+      <p>조직 KPI는 전사 → 본부 → 팀으로 내려오는 트리입니다. 개인은 <b>목표 설정 → 목표 추가</b>의 ‘조직 KPI 연결’에서 내 조직과 상위 조직의 KPI를 고릅니다. 연결된 목표 비율은 ‘정렬도’로 집계되어 <b>집계현황</b>에서 조직별로 보입니다.</p>
+      <p>관리자는 <b>조직·KPI</b> 화면에서 KPI의 가중치와 실제 달성률을 입력할 수 있고, 각 KPI에 연결된 개인 목표 수를 확인합니다.</p></section>
+
+    <section class="m-sec" id="peer" data-roles="all"><h2><span class="n">07</span>다면평가 (360°)</h2>
+      <p>한 사람을 옆에서도 보기 위한 <b>익명</b> 리뷰입니다. 점수에 자동 반영되지 않고, HR이 조정·확정 단계에서 참고합니다(조정·확정 보드 카드에 ‘360 평균’ 표시).</p>
+      <ul><li><b>동료</b> — 같은 조직의 다른 재직 구성원 (최대 3명 자동 배정)</li><li><b>하급자</b> — 대상자가 조직장인 경우 그 조직 구성원 (최대 3명)</li></ul>
+      <p>리뷰어는 <b>다면평가</b> 메뉴에서 대상자 카드의 ‘작성하기’를 눌러 전문성·협업·책임감·성장·신뢰 5개 항목에 1~5점과 익명 코멘트를 제출합니다. 제출 후에는 수정할 수 없고, 대상자에게는 평균과 코멘트만 순서를 섞어 공개됩니다.</p></section>
+
+    <section class="m-sec" id="grade" data-roles="all"><h2><span class="n">08</span>최종 점수와 등급</h2>
+      <div class="gbar"><div style="background:var(--gS)">S<div class="small">95점↑</div></div><div style="background:var(--gA)">A<div class="small">85점↑</div></div><div style="background:#94a3b8">B<div class="small">75점↑</div></div><div style="background:var(--gC)">C<div class="small">65점↑</div></div><div style="background:var(--gD)">D<div class="small">65점 미만</div></div></div>
+      <p>배분 가이드 기본값은 S 10% · A 20% · B 40% · C 20% · D 10%입니다. 관리자는 조정·확정 보드에서 실제 분포와 가이드를 비교하며 조정합니다.</p>
+      <div class="callout warn"><i data-lucide="lock"></i><div><b>확정 이후</b> 등급·점수는 확정 시점 규칙으로 스냅샷이 저장됩니다. 이후 규칙이 바뀌어도 과거 결과는 유지되며, 되돌리려면 재작성 요청이 필요합니다.</div></div></section>
+
+    <section class="m-sec" id="guide-me" data-roles="me"><h2><span class="n">09</span>피평가자 가이드</h2>
+      <ol>
+        <li><b>목표 설정</b>에서 ‘목표 추가’ → 조직 KPI와 연결된 목표 3~5개 작성. 오른쪽 <b>SMART 실시간 점검</b>이 구체성·측정·달성·관련성·기한을 확인합니다. 카드를 끌어 순서를 바꿀 수 있습니다.</li>
+        <li>가중치 링이 <b>100%</b>가 되면 ‘목표 제출’이 켜집니다. ‘가중치 균등 배분’으로 한 번에 맞출 수도 있습니다.</li>
+        <li>반려·수정 요청이 오면 홈의 ‘지금 할 일’과 알림 종에 표시됩니다. 평가자 의견을 보고 수정 후 재제출하세요.</li>
+        <li><b>실적·자기평가</b>에서 실적을 입력하면 달성률과 환산 점수가 즉시 계산됩니다. 입력 내용은 <b>자동 저장</b>됩니다.</li>
+        <li>역량 자기 진단(선택)과 코멘트(20자 이상)를 작성하고 제출합니다. 제출 후에는 수정할 수 없습니다.</li>
+        <li>결과 공개 단계가 되면 <b>내 평가 결과</b>에서 카드를 눌러 등급을 확인하고, 영역별 점수·목표별 산정 방식·평가자 의견·다면평가 익명 요약을 봅니다.</li></ol></section>
+
+    <section class="m-sec" id="guide-review" data-roles="review"><h2><span class="n">10</span>평가자(1차·2차) 가이드</h2>
+      <ol>
+        <li><b>목표 승인</b>: 제출된 목표를 승인·수정 요청·반려합니다. 수정 요청과 반려에는 5자 이상 사유가 필요하며, ‘전체 승인’으로 한 번에 처리할 수 있습니다.</li>
+        <li><b>평가 리뷰 → 1차 평가</b>: 목표별 점수(정성 필수, 정량은 자동 환산 또는 수기), 역량·자기개발/조직관리 5점 척도, 종합 의견(10자 이상)을 입력합니다. 오른쪽 <b>실시간 산정</b> 패널이 점수·등급과 산정 미완 사유를 보여줍니다.</li>
+        <li>회색 ‘본인 N’ 표시는 피평가자의 자기 진단 점수입니다. 다면평가 평균은 참고용입니다.</li>
+        <li><b>2차 검토</b>: 1차 제출 후 사유와 함께 ±10점 조정을 등록하고, 검토 의견을 작성해 ‘검토 완료’합니다.</li>
+        <li>제출한 평가는 수정할 수 없습니다. 필요하면 워크스페이스 상단의 <b>재작성 요청</b>으로 HR에 요청합니다.</li>
+        <li><b>팀 분포·현황</b>에서 담당 인원의 예상 등급 분포를 가이드와 비교합니다.</li></ol></section>
+
+    <section class="m-sec" id="guide-admin" data-roles="admin"><h2><span class="n">11</span>관리자(HR) 가이드</h2>
+      <h3>새 주기 시작</h3><p><b>평가 주기 → 새 주기</b>에서 이전 주기의 규칙·항목·평가 관계를 복사하거나, 기본값 + 조직장 기준 자동 배정으로 만듭니다. 비중·등급 기준·배분 가이드·환산표·단계 마감일을 저장하고 ‘활성화’합니다. 평가 항목은 카드를 끌어 순서와 영역을 바꿉니다.</p>
+      <h3>평가 관계</h3><p><b>보드</b>에서 피평가자 카드를 다른 평가자 레인으로 끌어 놓으면 1차 평가자가 바뀌고 2차는 그 평가자의 상위 조직장으로 자동 설정됩니다. <b>목록</b>에서는 1차·2차·평가 스킴을 직접 고릅니다. 본인 지정·순환 관계는 저장이 거부되고, 1차 평가가 제출된 인원은 잠깁니다.</p>
+      <h3>조정·확정</h3><p>성과 홈의 ‘확정 대기’ 카드를 눌러 이동합니다. 카드를 다른 등급 열로 끌면 그 등급에 필요한 조정 점수가 계산되어 사유 입력 후 등록됩니다(±10 이내). ‘조정·확정’ 단계에서 선택 확정 또는 일괄 확정하며, 산정 미완은 자동 제외됩니다.</p>
+      <h3>계정 일괄 발급</h3><p><b>사용자·권한</b>에서 ‘계정 미발급’ 필터 → 체크 → ‘계정 일괄 발급’. 임시 비밀번호 CSV가 내려받아지고, 첫 로그인 시 비밀번호 변경을 요구합니다.</p>
+      <h3>UI 스튜디오 (드래그앤드롭)</h3><p>코드 수정 없이 피평가자·평가자·관리자 화면의 <b>대시보드 위젯 배치</b>(팔레트에서 캔버스로 끌어 놓기, 이동·크기 조절), <b>사이드 메뉴</b>(순서·이름·숨김), <b>브랜드</b>(회사명·컬러·로그인 문구·3D 모션)를 바꾸고 ‘게시하기’로 적용합니다. ‘사용자 개인화 허용’을 끄면 개인 대시보드 편집이 잠깁니다.</p>
+      <h3>기타</h3><p><b>다면평가 관리</b>에서 리뷰어 자동 배정(기존 유지)·수동 추가, <b>집계현황</b>에서 조직별 진행률·정렬도·평균, <b>재작성 요청</b> 승인(작성중 전환·확정 해제), <b>감사 로그</b>로 모든 주요 행위를 추적합니다.</p></section>
+
+    <section class="m-sec" id="tips" data-roles="all"><h2><span class="n">12</span>더 빠르게 쓰는 팁</h2>
+      <div class="grid g2">
+        <div class="shot"><b><kbd>Ctrl</kbd> + <kbd>K</kbd> 빠른 이동</b><p class="small" style="margin:6px 0 0">메뉴·페이지 전환·테마·로그아웃을 키보드로 검색해 실행합니다.</p></div>
+        <div class="shot"><b>대시보드 편집</b><p class="small" style="margin:6px 0 0">홈 오른쪽 위 ‘대시보드 편집’ → 위젯을 끌어 옮기고 크기를 바꾸고 저장하면 나만의 배치가 됩니다. ‘기본값’으로 언제든 복원.</p></div>
+        <div class="shot"><b>다크 모드</b><p class="small" style="margin:6px 0 0">상단 해·달 아이콘으로 전환합니다. 차트 색도 함께 바뀝니다.</p></div>
+        <div class="shot"><b>자동 저장</b><p class="small" style="margin:6px 0 0">자기평가·1차 평가는 입력 즉시 임시 저장됩니다. 제출 전까지 언제든 이어서 작성하세요.</p></div></div></section>
+
+    <section class="m-sec" id="faq" data-roles="all"><h2><span class="n">13</span>자주 묻는 질문</h2>
+      <details class="faq"><summary>목표를 제출했는데 상황이 바뀌어 수정이 필요합니다.</summary><p>평가자가 반려 또는 수정 요청으로 돌려주면 다시 수정할 수 있습니다. 평가 진행 단계여도 반려된 목표는 재편집 가능합니다.</p></details>
+      <details class="faq"><summary>정량 목표 실적을 빼먹었습니다.</summary><p>점수 산정이 미완으로 남고 평가자 화면에 ‘산정 미완’이 표시됩니다. 1차 평가 제출 전이라면 실적·자기평가 화면에서 실적만 다시 입력하면 됩니다.</p></details>
+      <details class="faq"><summary>다면평가 코멘트가 대상자에게 그대로 보이나요?</summary><p>익명 요약(평균·코멘트)으로만, 순서를 섞어 전달됩니다. 리뷰어 이름은 노출되지 않습니다.</p></details>
+      <details class="faq"><summary>조정 점수는 어디까지 가능한가요?</summary><p>1회당 ±10점, 사유 5자 이상이 필수입니다. 여러 번 등록해 누적할 수 있지만 최종 점수는 0~100점 범위로 자릅니다.</p></details>
+      <details class="faq"><summary>직책이 ‘팀장’인데 팀원 스킴으로 평가받고 싶습니다.</summary><p>관리자가 평가 관계 → 목록의 ‘평가 스킴’에서 팀원 스킴으로 수동 지정하면 됩니다. 반대 경우도 같습니다.</p></details>
+      <details class="faq"><summary>과거 결과가 재계산될 수 있나요?</summary><p>확정 결과는 당시 규칙으로 스냅샷 저장되어 이후 규칙이 바뀌어도 유지됩니다. 재작성 요청 승인으로만 되돌릴 수 있습니다.</p></details>
+      <details class="faq"><summary>가중치 합계가 100%가 아니면?</summary><p>목표를 제출할 수 없고, 평가 제출 시에도 산정 미완으로 걸립니다. 목표 설정 화면의 가중치 링이 100%가 될 때까지 조정하세요.</p></details>
+      <details class="faq"><summary>평가자가 자기 자신을 평가할 수 있나요?</summary><p>본인을 평가자로 지정하거나 A→B→A처럼 순환하는 관계는 저장이 거부됩니다.</p></details>
+      <details class="faq"><summary>로그인이 잠겼어요.</summary><p>비밀번호를 5회 틀리면 5분간 잠깁니다. 비밀번호를 잊었다면 HR에 임시 비밀번호 재발급을 요청하세요.</p></details></section>
+
+    <section class="m-sec" id="terms" data-roles="all"><h2><span class="n">14</span>용어 사전</h2>
+      <div class="table-wrap"><table class="table"><tbody>
+        <tr><th>주기(Cycle)</th><td>평가가 시작되어 결과가 공개될 때까지의 기간. 보통 반기 단위.</td></tr>
+        <tr><th>단계(Phase)</th><td>준비·목표 설정·실적·자기평가·평가 진행·조정·확정·결과 공개·종료.</td></tr>
+        <tr><th>공통목표</th><td>개인이 조직 KPI와 연결해 작성하는 목표. 정량 또는 정성.</td></tr>
+        <tr><th>달성률</th><td>정량 목표의 실적 ÷ 목표값(%). 환산표로 점수화, 상한 150%.</td></tr>
+        <tr><th>SMART 점검</th><td>구체성·측정 가능·달성 가능·관련성·시간 제한 5개 기준 자동 점검.</td></tr>
+        <tr><th>정렬도</th><td>전체 개인 목표 중 조직 KPI에 연결된 비율.</td></tr>
+        <tr><th>스킴(Scheme)</th><td>세 영역의 비중 묶음. 팀원 40/40/20, 직책자 50/30/20.</td></tr>
+        <tr><th>조정(Adjustment)</th><td>2차 평가자 또는 HR이 사유와 함께 ±10점 범위에서 가감하는 값.</td></tr>
+        <tr><th>확정(Confirm)</th><td>결과를 봉인하는 처리. 이후에는 재작성 요청으로만 수정.</td></tr>
+        <tr><th>재작성 요청</th><td>제출·확정된 평가를 ‘작성중’으로 되돌리는 요청. 사유 필수.</td></tr>
+        <tr><th>UI 스튜디오</th><td>관리자가 역할별 화면 구성을 드래그앤드롭으로 바꾸는 기능.</td></tr></tbody></table></div></section>
+    <footer class="row between muted small"><span>KPC HR SYSTEM · 성과평가 매뉴얼 v2</span><span>인쇄 시 Ctrl+P (PDF로 저장 가능)</span></footer>
+  </main>
+</div>
+</body>
+</html>
