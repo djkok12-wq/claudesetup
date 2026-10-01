@@ -3,17 +3,33 @@
 `manual.html`(성과평가 매뉴얼)의 규칙을 그대로 구현하고, 화면과 구조는 처음부터 새로 만든 버전입니다.
 FastAPI + SQLite 백엔드에 빌드 과정이 없는 ES Module 프론트엔드를 붙였고, 외부 라이브러리는 `web/vendor`에 넣어 두어 CDN 없이(사내망·오프라인에서도) 동작합니다.
 
-## 1. 빠른 시작 (Windows · 로컬)
+## 1. 빠른 시작 (Windows · 원클릭 설치)
+
+1. 받은 `kpc-hr-system-v2.zip`을 우클릭 → **속성 → 차단 해제** 체크 → 확인 (인터넷에서 받은 파일 경고 방지)
+2. `C:\Users\USER\Desktop\.claude` 폴더에 압축을 풉니다 → `C:\Users\USER\Desktop\.claude\kpc-hr-system-v2\`
+3. 그 안의 **`SETUP_WINDOWS.bat`** 을 더블클릭합니다 (“Windows의 PC 보호” 창이 뜨면 *추가 정보 → 실행*).
+   - Python 3.10+ 확인(없으면 winget으로 자동 설치) → 가상환경·패키지 설치
+   - **시작프로그램 등록** → 재부팅 후 로그인하면 서버가 창 없이 자동 실행
+   - 바탕화면에 **KPC HR SYSTEM** 바로가기 생성 → 브라우저로 http://localhost:8000 열림
+
+| 파일 | 용도 |
+|---|---|
+| `SETUP_WINDOWS.bat` | 최초 설치·업데이트 후 재설치 (여러 번 실행해도 안전) |
+| `START.bat` | 서버 수동 실행 + 브라우저 열기 |
+| `STOP.bat` | 서버 종료 |
+| `server.log` | 자동 실행 시 서버 로그 (문제 생기면 확인) |
+
+자동 실행을 끄려면 `Win+R` → `shell:startup` → `KPC HR SYSTEM Server` 바로가기를 지우면 됩니다. 데이터는 `data\kpc_hr.db`에 저장되어 재부팅 후에도 그대로 남습니다.
+
+수동으로 실행하고 싶다면 다음과 같이 합니다.
 
 ```powershell
-cd kpc-hr-system-v2
+cd C:\Users\USER\Desktop\.claude\kpc-hr-system-v2
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
 python run.py
 ```
-
-브라우저에서 http://localhost:8000 을 엽니다. 처음 실행하면 `data/kpc_hr.db`에 데모 DB가 자동으로 만들어집니다.
 
 | 역할 | 로그인(이메일) | 비밀번호 | 첫 화면 |
 |---|---|---|---|
