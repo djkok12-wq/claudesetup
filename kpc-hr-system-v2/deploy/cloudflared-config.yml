@@ -1,24 +1,48 @@
-# 대안: 고정 IP가 없거나 사무실 회선에서 80/443 인바운드가 막혀 있을 때
-#      Cloudflare Tunnel 로 내보낸다 (무료 플랜 가능, 서버 포트 개방 불필요)
+# systemkpc.com — Cloudflare Tunnel 설정 (권장 경로)
 #
-# ⚠ 선행 조건 — 비용은 0원이지만 "도메인 영향 없음" 조건과 충돌할 수 있다:
-#   Cloudflare Tunnel 은 해당 도메인 존(airkpc.com)이 Cloudflare 에 등록돼 있어야 한다.
-#   = airkpc.com 네임서버를 Cloudflare 로 옮겨야 함 → 기존 A/MX/TXT 레코드 이관 누락 시
-#     홈페이지·메일이 끊길 위험이 있다. 서브도메인만 붙이는 CNAME(부분) 설정은 유료 플랜이다.
-#   네임서버를 옮기지 않을 거라면 이 파일 대신 DDNS + Caddy 방식(deploy/README.md 3-B)을 쓴다.
+# 왜 이 방식인가
+#   - 비용 0원 (Cloudflare Free 플랜 + Tunnel 무료)
+#   - 공유기·방화벽 포트(80/443) 개방 불필요, 고정 IP 불필요
+#   - HTTPS 인증서 자동, 서버 공인 IP 가 외부에 노출되지 않음
+#   - systemkpc.com 전용 설정이라 airkpc.com · airkpc.cafe24.com 과 완전히 분리된다
 #
-# 설치(윈도우/리눅스 동일 개념):
-#   cloudflared tunnel login
+# 선행 조건
+#   1. systemkpc.com 이 등록기관에 정상 등록되어 있어야 한다 (2026-10-02 기준 .com
+#      레지스트리에서 조회되지 않음 — deploy/README.md 0장 참고)
+#   2. systemkpc.com 의 네임서버를 Cloudflare 것으로 변경한다.
+#      → systemkpc.com 에는 현재 A·MX·TXT 레코드가 하나도 없으므로 잃을 설정이 없다.
+#      → airkpc.com 의 네임서버(ns1/ns2.cafe24.com)와 MX(mail.bizboxa.com)는 손대지 않는다.
+#
+# 설치 (서버에서 1회)
+#   cloudflared tunnel login                      # 브라우저에서 systemkpc.com 선택
 #   cloudflared tunnel create kpc-hr
-#   cloudflared tunnel route dns kpc-hr system.airkpc.com
-#   cloudflared tunnel run kpc-hr            # 서비스 등록: cloudflared service install
+#   cloudflared tunnel route dns kpc-hr systemkpc.com
+#   cloudflared tunnel route dns kpc-hr www.systemkpc.com
+#   cloudflared service install                   # 부팅 시 자동 실행
+#
+# 설정 파일 위치
+#   Windows: C:\Windows\System32\config\systemprofile\.cloudflared\config.yml
+#   Linux  : /etc/cloudflared/config.yml
 
 tunnel: kpc-hr
-credentials-file: /etc/cloudflared/kpc-hr.json
+credentials-file: C:\Windows\System32\config\systemprofile\.cloudflared\kpc-hr.json
+# Linux 라면: /etc/cloudflared/kpc-hr.json
 
 ingress:
-  - hostname: system.airkpc.com
+  # 운영 중 API 문서는 차단 (앱의 KPC_DOCS=0 과 이중 방어)
+  - hostname: systemkpc.com
+    path: ^/api/docs
+    service: http_status:404
+
+  - hostname: systemkpc.com
     service: http://127.0.0.1:8000
     originRequest:
-      httpHostHeader: system.airkpc.com
+      httpHostHeader: systemkpc.com
+      connectTimeout: 30s
+
+  - hostname: www.systemkpc.com
+    service: http://127.0.0.1:8000
+    originRequest:
+      httpHostHeader: systemkpc.com
+
   - service: http_status:404
