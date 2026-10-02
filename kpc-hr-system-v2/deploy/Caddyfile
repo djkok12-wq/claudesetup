@@ -1,0 +1,27 @@
+# system.airkpc.com — Caddy 리버스 프록시 (HTTPS 인증서 자동 발급·갱신, 무료)
+# 사용: caddy run --config Caddyfile   /   systemd: caddy reload
+#
+# 전제: 이 서버의 80·443 포트가 외부에서 열려 있고, system.airkpc.com A 레코드가
+#       이 서버를 가리킨다. (인증서 발급에 80 포트 필요)
+
+system.airkpc.com {
+	encode zstd gzip
+
+	# FastAPI(uvicorn)는 127.0.0.1:8000 에서만 듣게 두고, 외부 노출은 Caddy만 담당
+	reverse_proxy 127.0.0.1:8000 {
+		header_up X-Forwarded-Proto {scheme}
+	}
+
+	# 운영 중 API 문서 차단 (앱에서 KPC_DOCS=0 으로도 막지만 이중 방어)
+	@docs path /api/docs*
+	respond @docs 404
+
+	log {
+		output file /var/log/caddy/system.airkpc.com.log
+		format json
+	}
+
+	# ── 선택: 사내망·VPN만 허용하고 싶을 때 주석 해제 (HR 데이터 보호 권장) ──
+	# @outside not remote_ip 203.0.113.0/24 10.0.0.0/8
+	# respond @outside "Forbidden" 403
+}

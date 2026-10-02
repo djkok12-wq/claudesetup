@@ -1,0 +1,24 @@
+# 대안: 고정 IP가 없거나 사무실 회선에서 80/443 인바운드가 막혀 있을 때
+#      Cloudflare Tunnel 로 내보낸다 (무료 플랜 가능, 서버 포트 개방 불필요)
+#
+# ⚠ 선행 조건 — 비용은 0원이지만 "도메인 영향 없음" 조건과 충돌할 수 있다:
+#   Cloudflare Tunnel 은 해당 도메인 존(airkpc.com)이 Cloudflare 에 등록돼 있어야 한다.
+#   = airkpc.com 네임서버를 Cloudflare 로 옮겨야 함 → 기존 A/MX/TXT 레코드 이관 누락 시
+#     홈페이지·메일이 끊길 위험이 있다. 서브도메인만 붙이는 CNAME(부분) 설정은 유료 플랜이다.
+#   네임서버를 옮기지 않을 거라면 이 파일 대신 DDNS + Caddy 방식(deploy/README.md 3-B)을 쓴다.
+#
+# 설치(윈도우/리눅스 동일 개념):
+#   cloudflared tunnel login
+#   cloudflared tunnel create kpc-hr
+#   cloudflared tunnel route dns kpc-hr system.airkpc.com
+#   cloudflared tunnel run kpc-hr            # 서비스 등록: cloudflared service install
+
+tunnel: kpc-hr
+credentials-file: /etc/cloudflared/kpc-hr.json
+
+ingress:
+  - hostname: system.airkpc.com
+    service: http://127.0.0.1:8000
+    originRequest:
+      httpHostHeader: system.airkpc.com
+  - service: http_status:404
