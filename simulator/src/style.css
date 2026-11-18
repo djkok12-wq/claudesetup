@@ -99,3 +99,53 @@ table{width:100%;border-collapse:collapse;font-size:12px}
   #walkHud p{display:none}
   .rlabel{padding:2px 6px}.rlabel b{font-size:10.5px}.rlabel span{display:none}
 }
+
+/* ---- v2: 확장 비교 · 가구 배치 · 시나리오 ---- */
+#cmp{display:none;position:absolute;inset:0;pointer-events:none}
+#cmp.on{display:block}
+#cmp .bar{position:absolute;height:auto;margin:0;border-radius:0;top:0;bottom:0;left:50%;width:4px;margin-left:-2px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.15),0 0 12px rgba(0,0,0,.25);pointer-events:auto;cursor:ew-resize;touch-action:none}
+#cmp .bar i{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:16px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+.ctag{position:absolute;top:12px;left:12px;background:rgba(36,33,30,.82);color:#fff;font-size:12px;padding:6px 10px;border-radius:10px}
+.ctag.r{left:auto;right:12px;background:rgba(47,111,98,.92)}
+#cmpBefore{right:auto}
+#selHud{position:absolute;inset:0;pointer-events:none;display:none}
+#selHud.on{display:block}
+#selTag{position:absolute;left:0;top:0;background:rgba(255,255,255,.95);border-radius:10px;padding:5px 10px;font-size:12px;box-shadow:0 2px 10px rgba(0,0,0,.15);white-space:nowrap}
+#selTag em{display:block;font-style:normal;color:#c0392b;font-size:11px}
+#selBar{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.96);border-radius:14px;padding:6px;box-shadow:0 4px 18px rgba(0,0,0,.18);pointer-events:auto;max-width:calc(100% - 20px);overflow-x:auto}
+#selBar button{padding:7px 10px;border-radius:9px;font-size:12.5px;white-space:nowrap}
+#selBar button:hover{background:#f0ede7}
+#selBar .pal{display:flex;gap:4px;padding:0 6px;border-left:1px solid var(--line);border-right:1px solid var(--line)}
+#selBar .pal i{width:22px;height:22px;border-radius:50%;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+#selBar .pal i.on{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--hi)}
+.rlabel.exp{background:rgba(47,111,98,.9);color:#fff}.rlabel.exp span{color:#d9efe8}
+#cmpBtn.on{background:var(--hi);color:#fff}
+section.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.tg b.pl{font-size:11px;color:var(--hi);background:#e7efe9;border-radius:5px;padding:0 5px;margin-left:4px}
+.expsum{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 10px}
+.expsum>div{background:#f3f0ea;border-radius:10px;padding:8px 10px}
+.expsum small{display:block;font-size:11px;color:var(--sub)}.expsum b{font-size:18px}.expsum span{display:block;font-size:11px;color:var(--sub)}
+.btn.wide{width:100%}.btn.sm{padding:6px 10px;font-size:12px}.btn:disabled{opacity:.35;cursor:default}
+.pros{margin-top:10px;font-size:12.3px}.pros summary{cursor:pointer;color:var(--hi);font-weight:500}.pros ul{padding-left:16px;line-height:1.6;margin-top:6px}
+.seg.sm{margin-top:8px}.seg.sm button{font-size:12px;padding:5px 9px}
+.slots{display:grid;gap:6px}
+.slotc{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.slotc b{font-size:13px}.slotc small{flex:1;font-size:11px;color:var(--sub);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.slotc div{display:flex;gap:4px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+.warn{font-style:normal;color:#c0392b;font-weight:700}
+kbd{font-family:inherit;font-size:11px;background:#ece8e0;border-radius:4px;padding:0 4px}
+.flib{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0 18px}
+.fcard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px 6px 8px;text-align:left;display:flex;flex-direction:column;gap:1px;transition:.15s}
+.fcard:hover{border-color:var(--hi);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.fcard img{width:100%;aspect-ratio:4/3;object-fit:contain;background:#f4f2ee;border-radius:8px;margin-bottom:4px}
+.fcard b{font-size:12.3px}.fcard small{font-size:10.8px;color:var(--sub)}.fcard span{font-size:11px;color:var(--hi);font-weight:700;margin-top:2px}
+.flist{display:grid;gap:4px}
+.frow{display:flex;align-items:center;gap:8px;text-align:left;background:#fff;border:1.5px solid transparent;border-radius:10px;padding:5px 8px}
+.frow img{width:44px;height:33px;object-fit:contain;background:#f4f2ee;border-radius:6px}
+.frow div{flex:1;min-width:0}.frow b{font-size:12.5px;display:block}.frow small{font-size:10.8px;color:var(--sub)}
+.frow span{font-size:11px;color:var(--sub)}.frow.on{border-color:var(--hi);background:#f3f8f6}.frow.bad small{color:#c0392b}
+@media (max-width:900px){
+  #tabs button{font-size:12.5px;padding:11px 2px}
+  #cmpBtn{padding:6px 8px;font-size:12px}
+  #selBar button{padding:7px 8px;font-size:12px}
+}

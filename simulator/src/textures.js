@@ -265,3 +265,36 @@ function makeTexCanvas(item) {
   const seed = hashStr(item.id);
   return TEX[item.tex.k](item.tex, item.color, seed);
 }
+
+// ---------- 패브릭 (직조 질감, 그레이스케일 → 색상 곱) ----------
+function fabricCanvas(kind, seed) {
+  const R = rng(seed), S = 256, c = mkCanvas(S, S), ctx = c.getContext('2d');
+  ctx.fillStyle = '#e8e8e8'; ctx.fillRect(0, 0, S, S);
+  if (kind === 'boucle') {
+    for (let i = 0; i < 2600; i++) { const x = R() * S, y = R() * S, r = 1 + R() * 2.4; ctx.fillStyle = `rgba(${R() < .5 ? '255,255,255' : '120,120,120'},${.25 + R() * .3})`; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); }
+  } else if (kind === 'leather') {
+    for (let i = 0; i < 400; i++) { const x = R() * S, y = R() * S; ctx.strokeStyle = `rgba(90,90,90,${R() * .12})`; ctx.lineWidth = .6; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + (R() - .5) * 14, y + (R() - .5) * 14); ctx.stroke(); }
+  } else if (kind === 'rug') {
+    for (let y = 0; y < S; y += 3) for (let x = 0; x < S; x += 3) { ctx.fillStyle = `rgba(${R() < .5 ? '255,255,255' : '90,90,90'},${R() * .25})`; ctx.fillRect(x, y, 3, 3); }
+    ctx.strokeStyle = 'rgba(80,80,80,.18)'; ctx.lineWidth = 6; ctx.strokeRect(20, 20, S - 40, S - 40);
+  } else { // linen weave
+    for (let i = 0; i < S; i += 2) { ctx.fillStyle = `rgba(0,0,0,${R() * .09})`; ctx.fillRect(0, i, S, 1); ctx.fillStyle = `rgba(255,255,255,${R() * .1})`; ctx.fillRect(i, 0, 1, S); }
+  }
+  noise(ctx, S, S, 14, R);
+  return c;
+}
+
+// ---------- 아파트 입면 (주변 단지) ----------
+function facadeCanvas(seed, lit) {
+  const R = rng(seed), W = 512, Hh = 1024, c = mkCanvas(W, Hh), ctx = c.getContext('2d');
+  ctx.fillStyle = lit ? '#1c1f26' : '#e9e6df'; ctx.fillRect(0, 0, W, Hh);
+  const cols = 8, rows = 19, cw = W / cols, rh = Hh / rows;
+  for (let r = 0; r < rows; r++) for (let i = 0; i < cols; i++) {
+    const x = i * cw + cw * .12, y = r * rh + rh * .22, w = cw * .76, h = rh * .55;
+    if (lit) { ctx.fillStyle = R() < .45 ? `rgba(255,${190 + R() * 40 | 0},${120 + R() * 50 | 0},${.6 + R() * .4})` : 'rgba(30,34,44,1)'; }
+    else { ctx.fillStyle = R() < .15 ? '#9aa6ad' : '#7d8a93'; }
+    ctx.fillRect(x, y, w, h);
+    if (!lit) { ctx.fillStyle = '#f4f2ee'; ctx.fillRect(i * cw, r * rh + rh * .8, cw, rh * .08); }
+  }
+  return c;
+}

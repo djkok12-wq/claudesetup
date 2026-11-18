@@ -17,7 +17,7 @@
   <header>
     <div class="brand"><b>33평 리모델링 시뮬레이터</b><span>화정마을4단지 아이파크가야 · 84㎡ · 2026 트렌드</span></div>
     <div id="views" class="seg"><button data-v="orbit">조감</button><button data-v="top">평면</button><button data-v="walk">워크스루</button></div>
-    <div class="hr"><span id="totalChip"></span><button id="snap" class="btn ghost" title="현재 화면 이미지">📷</button></div>
+    <div class="hr"><button id="cmpBtn" class="btn ghost" title="발코니 확장 전/후 비교">↔ 확장 전/후</button><span id="totalChip"></span><button id="snap" class="btn ghost" title="현재 화면 이미지">📷</button></div>
   </header>
   <main>
     <div id="viewport">
@@ -27,11 +27,13 @@
         <p>드래그: 둘러보기 · W/A/S/D·방향키: 이동 · Shift: 빠르게</p>
         <div id="pad"><button data-k="w">▲</button><button data-k="q">⟲</button><button data-k="s">▼</button><button data-k="e">⟳</button></div>
       </div>
+      <div id="cmp"><div id="cmpBefore" class="ctag">확장 전 (현재 평면)</div><div id="cmpAfter" class="ctag r"></div><div class="bar"><i>↔</i></div></div>
+      <div id="selHud"><div id="selTag"></div><div id="selBar"></div></div>
       <div id="toast"></div>
       <div id="loading"><div class="spin"></div><p>3D 모델과 자재 텍스처를 만들고 있어요…</p></div>
     </div>
     <aside>
-      <nav id="tabs"><button data-t="concept">컨셉·옵션</button><button data-t="finish">마감재</button><button data-t="estimate">견적</button><button data-t="plan">기획서</button></nav>
+      <nav id="tabs"><button data-t="concept">컨셉·옵션</button><button data-t="finish">마감재</button><button data-t="furn">가구 배치</button><button data-t="estimate">견적</button><button data-t="plan">기획서</button></nav>
       <div id="pane"></div>
     </aside>
   </main>
@@ -41,6 +43,11 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 /*__JS__*/
 </script>
 </body>

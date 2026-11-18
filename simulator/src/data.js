@@ -12,6 +12,10 @@ const PLAN_META = {
 // ---------- 공간 (중심선 기준 사각형) ----------
 function getRooms(s) {
   const BAL = { floor: 'floor_balcony', wall: 'wall_balcony', kind: 'bal' };
+  const E = s.exp || {};
+  const bal = (id, name, xname, x1, z1, x2, z2, key, wall) => E[key]
+    ? { id, name: xname, x1, z1, x2, z2, floor: 'floor_main', wall, kind: 'dry', expanded: key, lights: 2 }
+    : { id, name, x1, z1, x2, z2, ...BAL, floorY: -60, lights: 1, expKey: key };
   return [
     { id: 'living', name: '거실', x1: 4090, z1: 8800, x2: 8780, z2: 13515, floor: 'floor_main', wall: 'wall_living', kind: 'dry', feature: { edge: 'left', slot: 'wall_feature' }, lights: 6 },
     { id: 'kitchen', name: '주방·식당', x1: 4090, z1: 5085, x2: 8010, z2: 8800, floor: 'floor_main', wall: 'wall_kitchen', kind: 'dry', lights: 4 },
@@ -26,13 +30,12 @@ function getRooms(s) {
     { id: 'bed3', name: '침실3·서재', x1: 1745, z1: 5085, x2: 4090, z2: 7755, floor: 'floor_main', wall: 'wall_bed3', kind: 'dry', lights: 2 },
     { id: 'bed2', name: '침실2·자녀방', x1: 8780, z1: 10280, x2: 11970, z2: 13515, floor: 'floor_main', wall: 'wall_bed2', kind: 'dry', lights: 4 },
     { id: 'cbath', name: '욕실2(공용)', x1: 9700, z1: 7225, x2: 11970, z2: 9620, floor: 'bath_floor', wall: 'bath_wall', kind: 'wet', lights: 2 },
-    { id: 'utility', name: '다용도실', x1: 4090, z1: 3185, x2: 8010, z2: 5085, ...BAL, lights: 1 },
-    { id: 'nbal', name: '북측 발코니', x1: 0, z1: 3485, x2: 4090, z2: 5085, ...BAL, lights: 1 },
-    { id: 'mbal', name: '안방 발코니', x1: 0, z1: 13515, x2: 4090, z2: 15015, ...BAL, lights: 1 },
-    s.expand
-      ? { id: 'lbal', name: '거실 확장부', x1: 4090, z1: 13515, x2: 8780, z2: 15015, floor: 'floor_main', wall: 'wall_living', kind: 'dry', lights: 2, nolabel: true }
-      : { id: 'lbal', name: '거실 발코니', x1: 4090, z1: 13515, x2: 8780, z2: 15015, ...BAL, lights: 1 },
-    { id: 'bbal', name: '침실2 발코니', x1: 8780, z1: 13515, x2: 11970, z2: 14700, ...BAL, lights: 1 },
+    { id: 'utility', name: '다용도실', x1: 4090, z1: 3185, x2: 8010, z2: 5085, ...BAL, floorY: -60, lights: 1 },
+    { id: 'nbal1', name: '욕실 앞 발코니', x1: 0, z1: 3485, x2: 1745, z2: 5085, ...BAL, floorY: -60, lights: 1, nolabel: true },
+    bal('nbal2', '침실3 발코니', '침실3 확장부', 1745, 3485, 4090, 5085, 'bed3', 'wall_bed3'),
+    bal('mbal', '안방 발코니', '안방 확장부', 0, 13515, 4090, 15015, 'master', 'wall_master'),
+    bal('lbal', '거실 발코니', '거실 확장부', 4090, 13515, 8780, 15015, 'living', 'wall_living'),
+    bal('bbal', '침실2 발코니', '침실2 확장부', 8780, 13515, 11970, 14700, 'bed2', 'wall_bed2'),
   ];
 }
 
@@ -57,19 +60,23 @@ function getOpenings(s) {
     { line: 'h', at: 7225, a: 8110, b: 9600, type: 'slide' },                          // 중문
     // 창호
     { line: 'h', at: 5085, a: 5600, b: 7400, type: 'window', sill: 1000, head: 2100 },  // 주방창
-    { line: 'h', at: 5085, a: 2100, b: 3800, type: 'slidewin', sill: 0, head: 2100 },   // 침실3→북측발코니
     { line: 'h', at: 5085, a: 500, b: 1200, type: 'window', sill: 1500, head: 2100 },   // 욕실1 창
-    { line: 'h', at: 13515, a: 300, b: 3800, type: 'slidewin', sill: 0, head: 2100 },   // 안방
-    { line: 'h', at: 13515, a: 9000, b: 11800, type: 'slidewin', sill: 0, head: 2100 }, // 침실2
-    { line: 'h', at: 15015, a: 200, b: 3900, type: 'window', sill: 900, head: 2200, ext: true },
-    { line: 'h', at: 15015, a: 4290, b: 8580, type: 'window', sill: s.expand ? 450 : 900, head: 2200, ext: true },
-    { line: 'h', at: 14700, a: 8980, b: 11770, type: 'window', sill: 900, head: 2200, ext: true },
     { line: 'h', at: 3185, a: 4300, b: 7800, type: 'window', sill: 900, head: 2200, ext: true },
-    { line: 'h', at: 3485, a: 200, b: 3900, type: 'window', sill: 900, head: 2200, ext: true },
+    { line: 'h', at: 3485, a: 200, b: 1545, type: 'window', sill: 900, head: 2200, ext: true },
   ];
-  // 거실 ↔ 발코니
-  if (s.expand) O.push({ line: 'h', at: 13515, a: 4090, b: 8780, type: 'open' });
-  else O.push({ line: 'h', at: 13515, a: 4300, b: 8600, type: 'slidewin', sill: 0, head: 2100 });
+  const E = s.exp || {}, xs = k => E[k] ? 450 : 900;
+  // 발코니 외부 창 (확장 시 이중창·창대 낮춤)
+  O.push({ line: 'h', at: 15015, a: 200, b: 3900, type: 'window', sill: xs('master'), head: 2200, ext: true });
+  O.push({ line: 'h', at: 15015, a: 4290, b: 8580, type: 'window', sill: xs('living'), head: 2200, ext: true });
+  O.push({ line: 'h', at: 14700, a: 8980, b: 11770, type: 'window', sill: xs('bed2'), head: 2200, ext: true });
+  O.push({ line: 'h', at: 3485, a: 1945, b: 3900, type: 'window', sill: xs('bed3'), head: 2200, ext: true });
+  // 실 ↔ 발코니 경계: 확장 시 창호 철거(상부 보 150mm 잔존), 비확장 시 미닫이 창
+  const edge = (k, at, a, b, wa, wb) => O.push(E[k] ? { line: 'h', at, a, b, type: 'open', beam: true } : { line: 'h', at, a: wa, b: wb, type: 'slidewin', sill: 0, head: 2100 });
+  edge('living', 13515, 4090, 8780, 4300, 8600);
+  edge('master', 13515, 0, 4090, 300, 3800);
+  edge('bed2', 13515, 8780, 11970, 9000, 11800);
+  edge('bed3', 5085, 1745, 4090, 2100, 3800);
+  if (!E.bed3) O.push({ line: 'v', at: 1745, a: 3485, b: 5085, type: 'open' });
   // 안방 드레스룸 구획(제안안) vs 원평면(복도형 전실)
   if (s.dress) O.push({ line: 'h', at: 9690, a: 200, b: 1000, type: 'arch' });
   else O.push({ line: 'v', at: 2600, a: 7755, b: 9690, type: 'open' });
@@ -201,6 +208,16 @@ const CATALOG = {
       { id: 'j_none', name: '중문 없음', spec: '—', color: '#000', panels: 0, price: 0 },
     ],
   },
+  curtain: {
+    label: '커튼·블라인드', zone: '침실', where: '거실·안방·침실2 창 (확장 시 외부창)', unit: 'm', qty: 'curtain',
+    items: [
+      { id: 'cu_double', name: '쉬어 + 암막 이중 커튼 · 오트밀', spec: '린넨 쉬어 + 암막 · 커튼박스 매립 레일', color: '#CDBFA8', sheer: '#F3F0EA', price: 170000, tag: '호텔식' },
+      { id: 'cu_sheer', name: '린넨 쉬어 커튼 · 화이트', spec: '쉬어 단독 · 2배 주름', color: '#F3F0EA', sheer: '#F3F0EA', only: 'sheer', price: 90000, tag: '소프트 미니멀' },
+      { id: 'cu_grey', name: '쉬어 + 암막 · 웜그레이', spec: '암막 3중직 · 매립 레일', color: '#8F8A83', sheer: '#EEEBE5', price: 170000 },
+      { id: 'cu_blind', name: '우드 블라인드 · 오크', spec: '50mm 슬랫 · 커튼박스 매립', color: '#B88E60', blind: true, price: 130000 },
+      { id: 'cu_none', name: '없음', spec: '—', color: '#ffffff', none: true, price: 0 },
+    ],
+  },
   wall_master: { label: '안방 벽', zone: '침실', where: '안방·드레스룸', unit: '㎡', qty: 'wall', items: WALL_ITEMS },
   wall_bed2: { label: '침실2 벽', zone: '침실', where: '자녀방', unit: '㎡', qty: 'wall', items: WALL_ITEMS },
   wall_bed3: { label: '침실3 벽', zone: '침실', where: '서재·게스트룸', unit: '㎡', qty: 'wall', items: WALL_ITEMS },
@@ -267,35 +284,35 @@ const CONCEPTS = [
     id: 'warm', name: '웜 미니멀 · 클라우드 댄서', en: 'Soft Minimal',
     desc: 'Pantone 2026 클라우드 댄서를 바탕색으로 쓰고, 광폭 오크와 트래버틴으로 온기를 더한 컨셉. 무몰딩·무문선·무걸레받이의 "3무" 디테일로 선을 정리해 면이 넓어 보입니다.',
     keys: ['Cloud Dancer', '광폭 오크', '3무 디테일', '트래버틴'],
-    pick: { floor_main: 'f_oak165', wall_living: 'w_cloud', wall_feature: 'a_trav', baseboard: 'b_minus', door: 'd_hidden', kitchen_lower: 'kl_cash', kitchen_upper: 'ku_white', countertop: 'c_calacatta', backsplash: 'bs_slab', wall_kitchen: 'w_cloud', floor_entry: 'e_trav', shoe: 's_white', jungmun: 'j_slim3', wall_master: 'w_linen', wall_bed2: 'w_warmsilk', wall_bed3: 'w_warmsilk', closet: 'cl_white', bath_wall: 'bw_warm', bath_floor: 'bf_greige', bath_fixture: 'fx_gun', floor_balcony: 'fb_grey', wall_balcony: 'wb_white' },
+    pick: { floor_main: 'f_oak165', wall_living: 'w_cloud', wall_feature: 'a_trav', baseboard: 'b_minus', door: 'd_hidden', kitchen_lower: 'kl_cash', kitchen_upper: 'ku_white', countertop: 'c_calacatta', backsplash: 'bs_slab', wall_kitchen: 'w_cloud', floor_entry: 'e_trav', shoe: 's_white', jungmun: 'j_slim3', wall_master: 'w_linen', wall_bed2: 'w_warmsilk', wall_bed3: 'w_warmsilk', closet: 'cl_white', bath_wall: 'bw_warm', bath_floor: 'bf_greige', bath_fixture: 'fx_gun', floor_balcony: 'fb_grey', wall_balcony: 'wb_white', curtain: 'cu_double' },
     light: { k: 3000 },
   },
   {
     id: 'japandi', name: '내추럴 재패니디', en: 'Natural Japandi',
     desc: '라이트 오크 초광폭 마루에 템바보드와 오크 무늬목을 반복해 쓴 컨셉. 세이지 그린 주방과 라임워시 질감으로 차분한 휴식형 공간을 만듭니다.',
     keys: ['초광폭 오크', '템바보드', '세이지 그린', '라임워시'],
-    pick: { floor_main: 'f_oakmax', wall_living: 'w_warmsilk', wall_feature: 'a_tambour', baseboard: 'b_tone', door: 'd_oak', kitchen_lower: 'kl_sage', kitchen_upper: 'ku_oak', countertop: 'c_trav', backsplash: 'bs_zellige', wall_kitchen: 'w_warmsilk', floor_entry: 'e_terrazzo', shoe: 's_tambour', jungmun: 'j_one', wall_master: 'w_limewash', wall_bed2: 'w_sage', wall_bed3: 'w_linen', closet: 'cl_oak', bath_wall: 'bw_trav', bath_floor: 'bf_terrazzo', bath_fixture: 'fx_black', floor_balcony: 'fb_deck', wall_balcony: 'wb_greige' },
+    pick: { floor_main: 'f_oakmax', wall_living: 'w_warmsilk', wall_feature: 'a_tambour', baseboard: 'b_tone', door: 'd_oak', kitchen_lower: 'kl_sage', kitchen_upper: 'ku_oak', countertop: 'c_trav', backsplash: 'bs_zellige', wall_kitchen: 'w_warmsilk', floor_entry: 'e_terrazzo', shoe: 's_tambour', jungmun: 'j_one', wall_master: 'w_limewash', wall_bed2: 'w_sage', wall_bed3: 'w_linen', closet: 'cl_oak', bath_wall: 'bw_trav', bath_floor: 'bf_terrazzo', bath_fixture: 'fx_black', floor_balcony: 'fb_deck', wall_balcony: 'wb_greige', curtain: 'cu_sheer' },
     light: { k: 2700 },
   },
   {
     id: 'mid', name: '모던 미드센추리 · 실루엣', en: 'Modern Mid-Century',
     desc: '월넛 헤링본과 BM 2026 실루엣(딥 브라운)을 묶은 컨셉. 다크 우드 쪽으로 옮겨가는 흐름을 반영했고, 브러시드 골드와 카키로 깊이를 더합니다.',
     keys: ['헤링본', 'Silhouette', '월넛', 'Universal Khaki'],
-    pick: { floor_main: 'f_herring', wall_living: 'w_warmsilk', wall_feature: 'a_walnut', baseboard: 'b_wood', door: 'd_walnut', kitchen_lower: 'kl_espresso', kitchen_upper: 'ku_white', countertop: 'c_calacatta', backsplash: 'bs_subway', wall_kitchen: 'w_warmsilk', floor_entry: 'e_charcoal', shoe: 's_oak', jungmun: 'j_swing', wall_master: 'w_khaki', wall_bed2: 'w_dustyblue', wall_bed3: 'w_butter', closet: 'cl_walnut', bath_wall: 'bw_mushroom', bath_floor: 'bf_charcoal', bath_fixture: 'fx_gold', floor_balcony: 'fb_terrazzo', wall_balcony: 'wb_white' },
+    pick: { floor_main: 'f_herring', wall_living: 'w_warmsilk', wall_feature: 'a_walnut', baseboard: 'b_wood', door: 'd_walnut', kitchen_lower: 'kl_espresso', kitchen_upper: 'ku_white', countertop: 'c_calacatta', backsplash: 'bs_subway', wall_kitchen: 'w_warmsilk', floor_entry: 'e_charcoal', shoe: 's_oak', jungmun: 'j_swing', wall_master: 'w_khaki', wall_bed2: 'w_dustyblue', wall_bed3: 'w_butter', closet: 'cl_walnut', bath_wall: 'bw_mushroom', bath_floor: 'bf_charcoal', bath_fixture: 'fx_gold', floor_balcony: 'fb_terrazzo', wall_balcony: 'wb_white', curtain: 'cu_blind' },
     light: { k: 2700 },
   },
   {
     id: 'hotel', name: '호텔라이크 그레이지', en: 'Hotel-like Greige',
     desc: '전 실 600×1200 포세린 바닥과 칼라카타 슬랩 아트월로 호텔 라운지 분위기를 낸 컨셉. 콘크리트 그레이 욕실과 브론즈 유리 붙박이장으로 대비를 줍니다.',
     keys: ['포세린 바닥', '칼라카타', '브론즈 유리', '건메탈'],
-    pick: { floor_main: 'f_porc', wall_living: 'w_greige', wall_feature: 'a_calacatta', baseboard: 'b_minus', door: 'd_greige', kitchen_lower: 'kl_navy', kitchen_upper: 'ku_cash', countertop: 'c_concrete', backsplash: 'bs_slab', wall_kitchen: 'w_greige', floor_entry: 'e_charcoal', shoe: 's_greige', jungmun: 'j_slim3', wall_master: 'w_greige', wall_bed2: 'w_warmsilk', wall_bed3: 'w_greige', closet: 'cl_bronze', bath_wall: 'bw_concrete', bath_floor: 'bf_charcoal', bath_fixture: 'fx_gun', floor_balcony: 'fb_grey', wall_balcony: 'wb_greige' },
+    pick: { floor_main: 'f_porc', wall_living: 'w_greige', wall_feature: 'a_calacatta', baseboard: 'b_minus', door: 'd_greige', kitchen_lower: 'kl_navy', kitchen_upper: 'ku_cash', countertop: 'c_concrete', backsplash: 'bs_slab', wall_kitchen: 'w_greige', floor_entry: 'e_charcoal', shoe: 's_greige', jungmun: 'j_slim3', wall_master: 'w_greige', wall_bed2: 'w_warmsilk', wall_bed3: 'w_greige', closet: 'cl_bronze', bath_wall: 'bw_concrete', bath_floor: 'bf_charcoal', bath_fixture: 'fx_gun', floor_balcony: 'fb_grey', wall_balcony: 'wb_greige', curtain: 'cu_grey' },
     light: { k: 3500 },
   },
   {
     id: 'value', name: '실속 화이트 (예산형)', en: 'Value White',
     desc: '바꾸기 어려운 공정(욕실·주방·바닥)은 제대로 하고, 도어는 필름 리폼, 벽은 실크벽지, 상판은 인조대리석으로 단가를 낮춘 컨셉. 샷시 교체를 빼면 시장 평균 범위에 들어옵니다.',
     keys: ['필름 리폼', '실크벽지', '인조대리석', '화이트 원톤'],
-    pick: { floor_main: 'f_oak165', wall_living: 'w_warmsilk', wall_feature: 'a_plain', baseboard: 'b_white', door: 'd_film', kitchen_lower: 'kl_white', kitchen_upper: 'ku_white', countertop: 'c_solid', backsplash: 'bs_subway', wall_kitchen: 'w_warmsilk', floor_entry: 'e_hex', shoe: 's_white', jungmun: 'j_one', wall_master: 'w_warmsilk', wall_bed2: 'w_warmsilk', wall_bed3: 'w_warmsilk', closet: 'cl_white', bath_wall: 'bw_warm', bath_floor: 'bf_greige', bath_fixture: 'fx_chrome', floor_balcony: 'fb_grey', wall_balcony: 'wb_white' },
+    pick: { floor_main: 'f_oak165', wall_living: 'w_warmsilk', wall_feature: 'a_plain', baseboard: 'b_white', door: 'd_film', kitchen_lower: 'kl_white', kitchen_upper: 'ku_white', countertop: 'c_solid', backsplash: 'bs_subway', wall_kitchen: 'w_warmsilk', floor_entry: 'e_hex', shoe: 's_white', jungmun: 'j_one', wall_master: 'w_warmsilk', wall_bed2: 'w_warmsilk', wall_bed3: 'w_warmsilk', closet: 'cl_white', bath_wall: 'bw_warm', bath_floor: 'bf_greige', bath_fixture: 'fx_chrome', floor_balcony: 'fb_grey', wall_balcony: 'wb_white', curtain: 'cu_sheer' },
     light: { k: 3000 },
   },
 ];
@@ -312,7 +329,10 @@ const FIXED_COSTS = [
 ];
 const OPTION_COSTS = {
   sash: { name: '샷시 전체 교체 (하이샷시·로이유리)', amt: 12000000, note: '노후도·브랜드에 따라 500만~1,500만 원' },
-  expand: { name: '거실 발코니 확장 (단열·바닥난방 연장)', amt: 4500000, note: '관리주체 행위허가 필요' },
+  exp_living: { name: '거실 발코니 확장 (+7.0㎡)', amt: 4800000, note: '창호 철거·단열·바닥난방 연장·이중창' },
+  exp_master: { name: '안방 발코니 확장 (+6.1㎡)', amt: 3800000, note: '단열·바닥난방 연장·이중창' },
+  exp_bed2: { name: '침실2 발코니 확장 (+3.8㎡)', amt: 2900000, note: '단열·바닥난방 연장·이중창' },
+  exp_bed3: { name: '침실3 발코니 확장 (+3.8㎡)', amt: 2700000, note: '북측 · 결로 대책 필수' },
   dress: { name: '드레스룸 구획 가벽·아치 개구부', amt: 1400000, note: '' },
   cove: { name: '간접조명 (거실 우물천장·라인조명·니치)', amt: 1800000, note: '' },
 };
