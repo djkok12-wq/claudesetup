@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>33평 전체 인테리어 3D 시뮬레이터 · 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F0EEE9;--ink:#24211e;--sub:#7a736a;--line:#e1dcd3;--card:#fbfaf7;--acc:#57504C;--acc2:#B8A992;--hi:#2f6f62}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',system-ui,-apple-system,sans-serif;font-size:14px;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+#app{display:flex;flex-direction:column;height:100%;padding-top:env(safe-area-inset-top)}
+header{display:flex;align-items:center;gap:14px;padding:10px 16px;border-bottom:1px solid var(--line);background:#faf9f6}
+.brand{display:flex;flex-direction:column;min-width:0;flex:1}
+.brand b{font-size:15px;letter-spacing:-.2px}.brand span{font-size:11.5px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hr{display:flex;align-items:center;gap:8px}
+#totalChip{font-size:12px;color:var(--sub);white-space:nowrap}#totalChip b{color:var(--ink);font-size:14px}
+.seg{display:inline-flex;background:#e9e5de;border-radius:10px;padding:3px;gap:2px}
+.seg button{padding:6px 12px;border-radius:8px;font-size:13px;color:var(--sub);white-space:nowrap}
+.seg button.on{background:#fff;color:var(--ink);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.btn{background:var(--ink);color:#fff;border-radius:10px;padding:9px 14px;font-weight:500;font-size:13px}
+.btn.ghost{background:#e9e5de;color:var(--ink);padding:7px 10px}
+main{flex:1;display:grid;grid-template-columns:1fr 410px;min-height:0}
+#viewport{position:relative;min-height:0;overflow:hidden;background:#e8e5df}
+#viewport canvas{display:block;width:100%;height:100%;touch-action:none}
+#labels{position:absolute;inset:0;pointer-events:none}
+.rlabel{position:absolute;left:0;top:0;pointer-events:auto;cursor:pointer;background:rgba(255,255,255,.86);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);border-radius:8px;padding:3px 8px;text-align:center;line-height:1.25;box-shadow:0 1px 4px rgba(0,0,0,.1);transition:opacity .2s}
+.rlabel b{display:block;font-size:11.5px}.rlabel span{font-size:10px;color:var(--sub)}
+#walkHud{display:none;position:absolute;left:12px;bottom:12px;right:12px;pointer-events:none;align-items:flex-end;justify-content:space-between;gap:10px}
+body.walking #walkHud{display:flex}
+#walkHud select{pointer-events:auto;font:inherit;padding:8px 10px;border-radius:10px;border:0;background:rgba(255,255,255,.92);box-shadow:0 2px 8px rgba(0,0,0,.15)}
+#walkHud p{color:#fff;font-size:11.5px;text-shadow:0 1px 3px rgba(0,0,0,.6);flex:1}
+#pad{pointer-events:auto;display:grid;grid-template-columns:repeat(2,52px);gap:6px}
+#pad button{height:46px;border-radius:12px;background:rgba(255,255,255,.88);font-size:18px;box-shadow:0 2px 8px rgba(0,0,0,.15);user-select:none;-webkit-user-select:none;touch-action:none}
+#toast{position:absolute;left:50%;top:14px;transform:translate(-50%,-10px);background:rgba(36,33,30,.9);color:#fff;padding:8px 14px;border-radius:20px;font-size:12.5px;opacity:0;transition:.25s;pointer-events:none;white-space:nowrap}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+#loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:var(--bg);transition:opacity .5s;color:var(--sub)}
+#loading.off{opacity:0;pointer-events:none}
+.spin{width:28px;height:28px;border:3px solid #ddd6cb;border-top-color:var(--acc);border-radius:50%;animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+aside{display:flex;flex-direction:column;min-height:0;border-left:1px solid var(--line);background:#faf9f6}
+#tabs{display:flex;border-bottom:1px solid var(--line);padding:0 8px}
+#tabs button{flex:1;padding:12px 4px;font-size:13.5px;color:var(--sub);border-bottom:2px solid transparent}
+#tabs button.on{color:var(--ink);font-weight:700;border-color:var(--ink)}
+#pane{flex:1;overflow-y:auto;padding:14px 16px 40px;-webkit-overflow-scrolling:touch;padding-bottom:calc(40px + env(safe-area-inset-bottom))}
+section{margin-bottom:22px}
+h2{font-size:15px;margin-bottom:10px;display:flex;align-items:center;gap:6px}h2 em{font-style:normal;font-size:11px;background:var(--acc);color:#fff;border-radius:6px;padding:1px 6px}
+.hint{font-size:12px;color:var(--sub);margin:6px 0 10px;line-height:1.5}
+.concepts{display:grid;gap:10px}
+.concept{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;transition:.15s}
+.concept:hover{border-color:var(--acc2)}.concept.on{border-color:var(--ink);box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.concept .chips{display:flex;margin-bottom:8px}.concept .chips i{width:26px;height:26px;border-radius:50%;border:2px solid #fff;margin-right:-6px;box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.concept h3{font-size:14px;display:flex;align-items:baseline;gap:6px}.concept h3 small{font-weight:400;font-size:11px;color:var(--sub)}
+.concept p{font-size:12.3px;color:#5d574f;line-height:1.55;margin:4px 0 8px}
+.keys{display:flex;flex-wrap:wrap;gap:4px}.keys span{font-size:11px;background:#ece8e0;border-radius:6px;padding:2px 7px;color:#5d574f}
+.tg{display:flex;align-items:flex-start;gap:10px;padding:8px 0;cursor:pointer;border-bottom:1px dashed var(--line)}
+.tg input{display:none}.tg>span{flex:none;width:36px;height:21px;border-radius:12px;background:#d9d3c9;position:relative;transition:.2s;margin-top:1px}
+.tg>span:after{content:'';position:absolute;left:2px;top:2px;width:17px;height:17px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.tg input:checked+span{background:var(--hi)}.tg input:checked+span:after{left:17px}
+.tg div{font-size:13px;line-height:1.35}.tg small{display:block;font-size:11.5px;color:var(--sub)}
+.tg.sm{border:0}
+.kel{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:12.5px}.kel input{flex:1;accent-color:var(--acc)}
+.zones{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;position:sticky;top:-14px;background:#faf9f6;z-index:2;padding-top:4px}
+.zones button{flex:none;padding:6px 12px;border-radius:16px;background:#ece8e0;font-size:12.5px}.zones button.on{background:var(--ink);color:#fff}
+.slot{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px;scroll-margin-top:44px;transition:box-shadow .3s}
+.slot.pulse{box-shadow:0 0 0 3px rgba(47,111,98,.35)}
+.sh{display:flex;align-items:baseline;gap:8px}.sh h3{font-size:14px}.sh span{font-size:11.5px;color:var(--sub)}
+.qty{font-size:11.5px;color:var(--sub);margin:3px 0 8px}.qty b{color:var(--ink)}
+.items{display:grid;gap:6px}
+.item{display:flex;gap:10px;text-align:left;padding:7px;border-radius:10px;border:1.5px solid transparent;background:#fff;align-items:center}
+.item:hover{border-color:var(--line)}.item.on{border-color:var(--hi);background:#f3f8f6}
+.item img{width:52px;height:52px;border-radius:8px;flex:none;object-fit:cover;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
+.item div{min-width:0;display:flex;flex-direction:column;gap:1px}.item b{font-size:12.8px}.item small{font-size:11px;color:var(--sub);line-height:1.35}
+.item .pr{font-size:11px;color:#5d574f}.item em{font-style:normal;align-self:flex-start;font-size:10px;background:#e7efe9;color:var(--hi);border-radius:5px;padding:0 5px;margin-top:2px}
+.sum{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.big small{display:block;font-size:12px;color:var(--sub)}.big b{font-size:28px;letter-spacing:-.5px}.big span{display:block;font-size:12px;color:var(--sub)}
+.range{margin:12px 0}.bar{position:relative;height:10px;background:#ece8e0;border-radius:6px;margin-bottom:6px}
+.bar .mk{position:absolute;top:0;bottom:0;background:#c9c2b6;border-radius:6px}.bar .me{position:absolute;top:-4px;width:4px;height:18px;margin-left:-2px;background:var(--hi);border-radius:2px}
+.range small{font-size:11px;color:var(--sub)}
+.sum .btn{width:100%;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+.est td,.est th{padding:6px 4px;border-bottom:1px solid #ece8e0;text-align:right;vertical-align:top}
+.est td:first-child,.est th:first-child{text-align:left}.est small{display:block;color:var(--sub);font-size:10.5px}
+.est th{font-size:11px;color:var(--sub);font-weight:500}
+.est tr.cat td{font-weight:700;background:#f1eee8;padding-top:7px}.est tr.tot td{font-weight:700;font-size:14px;border-top:2px solid var(--ink)}
+.note{font-size:11.3px;color:var(--sub);line-height:1.55;margin-top:10px}
+.doc h2{font-size:18px}.doc .meta{font-size:11.5px;color:var(--sub);margin:-4px 0 12px}
+.doc h3{font-size:14px;margin:18px 0 8px;padding-top:12px;border-top:1px solid var(--line)}
+.doc ul{padding-left:18px;line-height:1.6;font-size:12.6px}.doc li{margin-bottom:4px}
+.doc table th,.doc table td{padding:6px;border-bottom:1px solid #ece8e0;text-align:left;vertical-align:top;font-size:12px}
+.doc table th{width:64px;color:var(--sub);font-weight:500}
+.doc table.small thead th{width:auto}.doc table small{display:block;color:var(--sub);font-size:10.5px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:-1px;margin-right:4px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.callout{background:#f3efe6;border-left:3px solid var(--acc);padding:10px 12px;border-radius:0 10px 10px 0;font-size:12.5px;line-height:1.6;margin:12px 0}
+.callout b{display:block;margin-bottom:2px}
+.check li{list-style:'☐  '}
+.src{padding-left:18px;font-size:11.5px;line-height:1.7}.src a{color:var(--hi)}
+#shot{position:fixed;inset:0;background:rgba(20,18,16,.75);display:none;align-items:center;justify-content:center;z-index:9;padding:20px}
+#shot.on{display:flex}#shot div{max-width:900px;text-align:center}#shot img{max-width:100%;max-height:75vh;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+#shot p{color:#eee;font-size:12px;margin-top:10px}
+@media (max-width:900px){
+  header{flex-wrap:wrap;gap:8px;padding:8px 12px}
+  .brand{flex-basis:100%}.brand span{font-size:11px}
+  #views{flex:1}#views button{flex:1;padding:6px 8px}
+  main{grid-template-columns:1fr;grid-template-rows:52vh 1fr}
+  aside{border-left:0;border-top:1px solid var(--line)}
+  #walkHud p{display:none}
+  .rlabel{padding:2px 6px}.rlabel b{font-size:10.5px}.rlabel span{display:none}
+}
+
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="brand"><b>33평 리모델링 시뮬레이터</b><span>화정마을4단지 아이파크가야 · 84㎡ · 2026 트렌드</span></div>
+    <div id="views" class="seg"><button data-v="orbit">조감</button><button data-v="top">평면</button><button data-v="walk">워크스루</button></div>
+    <div class="hr"><span id="totalChip"></span><button id="snap" class="btn ghost" title="현재 화면 이미지">📷</button></div>
+  </header>
+  <main>
+    <div id="viewport">
+      <div id="labels"></div>
+      <div id="walkHud">
+        <select id="roomSel" aria-label="공간 이동"></select>
+        <p>드래그: 둘러보기 · W/A/S/D·방향키: 이동 · Shift: 빠르게</p>
+        <div id="pad"><button data-k="w">▲</button><button data-k="q">⟲</button><button data-k="s">▼</button><button data-k="e">⟳</button></div>
+      </div>
+      <div id="toast"></div>
+      <div id="loading"><div class="spin"></div><p>3D 모델과 자재 텍스처를 만들고 있어요…</p></div>
+    </div>
+    <aside>
+      <nav id="tabs"><button data-t="concept">컨셉·옵션</button><button data-t="finish">마감재</button><button data-t="estimate">견적</button><button data-t="plan">기획서</button></nav>
+      <div id="pane"></div>
+    </aside>
+  </main>
+</div>
+<div id="shot"><div><img id="shotImg" alt="스냅샷"><p>이미지를 길게 누르거나 우클릭해서 저장하세요 · 바깥을 누르면 닫혀요</p></div></div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+// ============================================================
+//  DATA : 평면 · 마감재 카탈로그 · 컨셉 프리셋 · 견적 기준
+//  단위: 평면 좌표 mm (x: 좌→우, z: 북(상)→남(하)), 높이 mm
+// ============================================================
+
+const PLAN_META = {
+  name: '화정마을4단지 아이파크가야 413동 · 84㎡ (33평형)',
+  supply: 112.1, exclusive: 84.96, pyeong: 33,
+  ceiling: 2300, doorH: 2100, wallT: 200,
+};
+
+// ---------- 공간 (중심선 기준 사각형) ----------
+function getRooms(s) {
+  const BAL = { floor: 'floor_balcony', wall: 'wall_balcony', kind: 'bal' };
+  return [
+    { id: 'living', name: '거실', x1: 4090, z1: 8800, x2: 8780, z2: 13515, floor: 'floor_main', wall: 'wall_living', kind: 'dry', feature: { edge: 'left', slot: 'wall_feature' }, lights: 6 },
+    { id: 'kitchen', name: '주방·식당', x1: 4090, z1: 5085, x2: 8010, z2: 8800, floor: 'floor_main', wall: 'wall_kitchen', kind: 'dry', lights: 4 },
+    { id: 'hallL', name: '침실 복도', x1: 2600, z1: 7755, x2: 4090, z2: 9690, floor: 'floor_main', wall: 'wall_living', kind: 'dry', lights: 1, nolabel: true },
+    { id: 'hallA', name: '복도', x1: 8010, z1: 7225, x2: 9700, z2: 8800, floor: 'floor_main', wall: 'wall_living', kind: 'dry', lights: 1, nolabel: true },
+    { id: 'hallB', name: '복도', x1: 8780, z1: 8800, x2: 9700, z2: 10280, floor: 'floor_main', wall: 'wall_living', kind: 'dry', lights: 1, nolabel: true },
+    { id: 'hallC', name: '복도 수납', x1: 9700, z1: 9620, x2: 11970, z2: 10280, floor: 'floor_main', wall: 'wall_living', kind: 'dry', lights: 1, nolabel: true },
+    { id: 'entry', name: '현관', x1: 8010, z1: 4800, x2: 9700, z2: 7225, floor: 'floor_entry', wall: 'wall_living', kind: 'entry', floorY: -120, lights: 1 },
+    { id: 'master', name: '안방', x1: 0, z1: 9690, x2: 4090, z2: 13515, floor: 'floor_main', wall: 'wall_master', kind: 'dry', lights: 4 },
+    { id: 'dress', name: s.dress ? '안방 드레스룸' : '안방 앞 전실', x1: 0, z1: 7755, x2: 2600, z2: 9690, floor: 'floor_main', wall: 'wall_master', kind: 'dry', lights: 2 },
+    { id: 'mbath', name: '욕실1', x1: 0, z1: 5085, x2: 1745, z2: 7755, floor: 'bath_floor', wall: 'bath_wall', kind: 'wet', lights: 2 },
+    { id: 'bed3', name: '침실3·서재', x1: 1745, z1: 5085, x2: 4090, z2: 7755, floor: 'floor_main', wall: 'wall_bed3', kind: 'dry', lights: 2 },
+    { id: 'bed2', name: '침실2·자녀방', x1: 8780, z1: 10280, x2: 11970, z2: 13515, floor: 'floor_main', wall: 'wall_bed2', kind: 'dry', lights: 4 },
+    { id: 'cbath', name: '욕실2(공용)', x1: 9700, z1: 7225, x2: 11970, z2: 9620, floor: 'bath_floor', wall: 'bath_wall', kind: 'wet', lights: 2 },
+    { id: 'utility', name: '다용도실', x1: 4090, z1: 3185, x2: 8010, z2: 5085, ...BAL, lights: 1 },
+    { id: 'nbal', name: '북측 발코니', x1: 0, z1: 3485, x2: 4090, z2: 5085, ...BAL, lights: 1 },
+    { id: 'mbal', name: '안방 발코니', x1: 0, z1: 13515, x2: 4090, z2: 15015, ...BAL, lights: 1 },
+    s.expand
+      ? { id: 'lbal', name: '거실 확장부', x1: 4090, z1: 13515, x2: 8780, z2: 15015, floor: 'floor_main', wall: 'wall_living', kind: 'dry', lights: 2, nolabel: true }
+      : { id: 'lbal', name: '거실 발코니', x1: 4090, z1: 13515, x2: 8780, z2: 15015, ...BAL, lights: 1 },
+    { id: 'bbal', name: '침실2 발코니', x1: 8780, z1: 13515, x2: 11970, z2: 14700, ...BAL, lights: 1 },
+  ];
+}
+
+// ---------- 개구부 ----------
+// line 'h' = z 고정 수평선(x a..b), 'v' = x 고정 수직선(z a..b)
+// type: open | door | arch | window | slidewin | entry | slide(중문)
+// swing: 문짝이 열리는 방향(+1: 좌표 증가 방향), hinge: 'a' | 'b'
+function getOpenings(s) {
+  const O = [
+    { line: 'h', at: 8800, a: 4090, b: 9700, type: 'open' },
+    { line: 'v', at: 4090, a: 7755, b: 9690, type: 'open' },
+    { line: 'v', at: 8010, a: 7225, b: 8800, type: 'open' },
+    { line: 'v', at: 8780, a: 8800, b: 10280, type: 'open' },
+    { line: 'v', at: 9700, a: 9620, b: 10280, type: 'open' },
+    { line: 'h', at: 7755, a: 3150, b: 3950, type: 'door', swing: -1, hinge: 'b' },   // 침실3
+    { line: 'h', at: 9690, a: 3150, b: 3950, type: 'door', swing: 1, hinge: 'b' },    // 안방
+    { line: 'h', at: 7755, a: 450, b: 1250, type: 'door', swing: -1, hinge: 'a', bath: true }, // 욕실1
+    { line: 'v', at: 9700, a: 7650, b: 8450, type: 'door', swing: 1, hinge: 'b', bath: true }, // 욕실2
+    { line: 'h', at: 10280, a: 8900, b: 9700, type: 'door', swing: 1, hinge: 'a' },   // 침실2
+    { line: 'h', at: 5085, a: 4300, b: 5100, type: 'door', swing: -1, hinge: 'a', glass: true }, // 다용도실
+    { line: 'v', at: 9700, a: 5300, b: 6300, type: 'entry' },                          // 현관문
+    { line: 'h', at: 7225, a: 8110, b: 9600, type: 'slide' },                          // 중문
+    // 창호
+    { line: 'h', at: 5085, a: 5600, b: 7400, type: 'window', sill: 1000, head: 2100 },  // 주방창
+    { line: 'h', at: 5085, a: 2100, b: 3800, type: 'slidewin', sill: 0, head: 2100 },   // 침실3→북측발코니
+    { line: 'h', at: 5085, a: 500, b: 1200, type: 'window', sill: 1500, head: 2100 },   // 욕실1 창
+    { line: 'h', at: 13515, a: 300, b: 3800, type: 'slidewin', sill: 0, head: 2100 },   // 안방
+    { line: 'h', at: 13515, a: 9000, b: 11800, type: 'slidewin', sill: 0, head: 2100 }, // 침실2
+    { line: 'h', at: 15015, a: 200, b: 3900, type: 'window', sill: 900, head: 2200, ext: true },
+    { line: 'h', at: 15015, a: 4290, b: 8580, type: 'window', sill: s.expand ? 450 : 900, head: 2200, ext: true },
+    { line: 'h', at: 14700, a: 8980, b: 11770, type: 'window', sill: 900, head: 2200, ext: true },
+    { line: 'h', at: 3185, a: 4300, b: 7800, type: 'window', sill: 900, head: 2200, ext: true },
+    { line: 'h', at: 3485, a: 200, b: 3900, type: 'window', sill: 900, head: 2200, ext: true },
+  ];
+  // 거실 ↔ 발코니
+  if (s.expand) O.push({ line: 'h', at: 13515, a: 4090, b: 8780, type: 'open' });
+  else O.push({ line: 'h', at: 13515, a: 4300, b: 8600, type: 'slidewin', sill: 0, head: 2100 });
+  // 안방 드레스룸 구획(제안안) vs 원평면(복도형 전실)
+  if (s.dress) O.push({ line: 'h', at: 9690, a: 200, b: 1000, type: 'arch' });
+  else O.push({ line: 'v', at: 2600, a: 7755, b: 9690, type: 'open' });
+  return O;
+}
+
+// ---------- 마감재 카탈로그 ----------
+// price: 시공비 포함 개략 단가(원) / unit 기준. 2026 시세 '추정치' — 실측 견적으로 대체 필요
+const WALL_ITEMS = [
+  { id: 'w_cloud', name: '클라우드 댄서 친환경 도장', spec: 'Pantone 11-4201 · 저VOC 수성 · 무광', color: '#F0EEE9', tex: { k: 'paint' }, rough: .92, price: 38000, tag: 'Pantone 2026' },
+  { id: 'w_warmsilk', name: '웜화이트 실크벽지', spec: '무지 초극세 엠보 · 광폭 106cm', color: '#ECE7DF', tex: { k: 'paper', p: 'silk' }, rough: .7, price: 22000, tag: '스테디' },
+  { id: 'w_greige', name: '그레이지 실크벽지', spec: '무지 실크 · 웜그레이 베이지', color: '#D9D2C6', tex: { k: 'paper', p: 'silk' }, rough: .7, price: 22000 },
+  { id: 'w_linen', name: '린넨 텍스처 벽지', spec: '패브릭 질감 프린트 실크', color: '#E3DBCD', tex: { k: 'paper', p: 'linen' }, rough: .85, price: 25000, tag: '소프트 미니멀' },
+  { id: 'w_khaki', name: '유니버설 카키 도장', spec: 'SW 6150 계열 · 무광', color: '#B8A992', tex: { k: 'paint' }, rough: .9, price: 38000, tag: 'SW 2026' },
+  { id: 'w_limewash', name: '라임워시 도장', spec: '석회 텍스처 · 붓자국 마감', color: '#D8CDBE', tex: { k: 'lime' }, rough: .95, price: 65000, tag: '질감 트렌드' },
+  { id: 'w_sage', name: '세이지 그린 도장', spec: '무광 · 포인트 1면 권장', color: '#A9B19E', tex: { k: 'paint' }, rough: .9, price: 38000 },
+  { id: 'w_dustyblue', name: '더스티 블루 도장', spec: '무광 · 자녀방 추천', color: '#A7B4BF', tex: { k: 'paint' }, rough: .9, price: 38000 },
+  { id: 'w_butter', name: '버터 크림 실크벽지', spec: '웜 옐로우 베이지', color: '#EFE2C4', tex: { k: 'paper', p: 'silk' }, rough: .7, price: 22000 },
+];
+
+const CATALOG = {
+  floor_main: {
+    label: '바닥재', zone: '공용부', where: '거실·주방·복도·침실 (전 실 통일)', unit: '㎡', qty: 'floor',
+    items: [
+      { id: 'f_oak165', name: '내추럴 오크 광폭 강마루', spec: '강마루 · 폭 165mm × 1200 · 무광 브러시드', color: '#C49E72', tex: { k: 'wood', w: 165, l: 1200, v: .07 }, rough: .55, price: 95000, tag: '2026 최다 선호' },
+      { id: 'f_oakmax', name: '라이트 오크 초광폭 강마루', spec: '강마루 · 폭 240mm × 1800 · 무광', color: '#D3B58E', tex: { k: 'wood', w: 240, l: 1800, v: .06 }, rough: .55, price: 115000, tag: '초광폭' },
+      { id: 'f_herring', name: '오크 헤링본 원목마루', spec: '원목마루 3mm 무늬목 · 100×600 헤링본', color: '#C8A273', tex: { k: 'herring', w: 100, l: 600, v: .09 }, rough: .5, price: 165000, tag: '프리미엄' },
+      { id: 'f_greige', name: '그레이지 워시드 오크 강마루', spec: '강마루 · 폭 165mm · 화이트워시', color: '#BDB09C', tex: { k: 'wood', w: 165, l: 1200, v: .05 }, rough: .6, price: 95000 },
+      { id: 'f_walnut', name: '모던 월넛 원목마루', spec: '원목마루 · 폭 190mm · 오일 마감', color: '#6F4C35', tex: { k: 'wood', w: 190, l: 1500, v: .09 }, rough: .5, price: 150000, tag: '다크우드 회귀' },
+      { id: 'f_porc', name: '웜그레이 포세린 타일', spec: '포세린 600×1200 · 무광 · 바닥난방 대응', color: '#CDC5B9', tex: { k: 'tile', w: 600, h: 1200, g: '#B9B1A5', vein: 'stone' }, rough: .45, price: 140000, tag: '호텔라이크' },
+    ],
+  },
+  wall_living: { label: '거실·복도 벽', zone: '공용부', where: '거실·복도·현관 벽면', unit: '㎡', qty: 'wall', items: WALL_ITEMS },
+  wall_feature: {
+    label: '거실 아트월', zone: '공용부', where: 'TV 벽 1면 (W 3.8m)', unit: '㎡', qty: 'wall',
+    items: [
+      { id: 'a_trav', name: '트래버틴 포세린 슬랩', spec: '포세린 800×1600 · 트래버틴 패턴 · 무광', color: '#D6C9B5', tex: { k: 'tile', w: 800, h: 1600, g: '#C9BBA6', vein: 'trav' }, rough: .5, price: 210000, tag: '빅슬랩' },
+      { id: 'a_tambour', name: '오크 템바보드', spec: '반원 리브 15mm · 천연 무늬목', color: '#C29B6E', tex: { k: 'tambour', r: 22 }, rough: .6, price: 160000, tag: '질감' },
+      { id: 'a_walnut', name: '월넛 무늬목 패널', spec: '천연 무늬목 · 600mm 분할 V홈', color: '#6D4A33', tex: { k: 'veneer', w: 600 }, rough: .5, price: 180000 },
+      { id: 'a_lime', name: '라임워시 텍스처 도장', spec: '석회 도장 · 수작업 질감', color: '#CFC3B2', tex: { k: 'lime' }, rough: .95, price: 70000 },
+      { id: 'a_calacatta', name: '칼라카타 포세린 슬랩', spec: '포세린 1200×2400 · 유광 대리석 패턴', color: '#EEEBE6', tex: { k: 'tile', w: 1200, h: 2400, g: '#E2DED8', vein: 'marble' }, rough: .2, price: 260000 },
+      { id: 'a_plain', name: '아트월 없음 (벽과 동일 도장)', spec: '원톤 · 3무 인테리어', color: '#F0EEE9', tex: { k: 'paint' }, rough: .92, price: 38000, tag: '원톤' },
+    ],
+  },
+  baseboard: {
+    label: '걸레받이·몰딩', zone: '공용부', where: '전 실 (건식 공간)', unit: 'm', qty: 'base',
+    items: [
+      { id: 'b_minus', name: '무걸레받이 · 마이너스 몰딩', spec: '3무 디테일 · 10mm 섀도우 갭', color: '#2B2826', h: 12, inset: true, rough: .8, price: 32000, tag: '3무 인테리어' },
+      { id: 'b_tone', name: '벽 동색 걸레받이 60mm', spec: '원톤 · 도장 마감', color: 'wall', h: 60, rough: .8, price: 12000 },
+      { id: 'b_white', name: '슬림 화이트 걸레받이 40mm', spec: 'PVC 슬림', color: '#F2F0EC', h: 40, rough: .5, price: 9000 },
+      { id: 'b_wood', name: '마루 동색 걸레받이 60mm', spec: '마루 톤 매칭', color: 'floor', h: 60, rough: .6, price: 10000 },
+    ],
+  },
+  door: {
+    label: '실내 도어', zone: '공용부', where: '침실·욕실·다용도실 도어 6짝', unit: '짝', qty: 'doors',
+    items: [
+      { id: 'd_hidden', name: '화이트 히든도어 (무문선)', spec: '문선 없는 매립 문틀 · 마그네틱 도어락', color: '#F1EFEA', hidden: true, handle: '#2A2A2A', rough: .5, price: 950000, tag: '3무 인테리어' },
+      { id: 'd_abs', name: '화이트 ABS 도어', spec: 'ABS 도어 + 슬림 문선 · 레버 핸들', color: '#EFEDE8', handle: '#B9B9B9', rough: .45, price: 480000, tag: '가성비' },
+      { id: 'd_greige', name: '캐시미어 그레이지 ABS 도어', spec: 'ABS · 웜그레이', color: '#CFC7BB', handle: '#3A3A3A', rough: .5, price: 520000 },
+      { id: 'd_oak', name: '내추럴 오크 무늬목 도어', spec: '천연 무늬목 · 무광 우레탄', color: '#C29D72', tex: { k: 'veneer', w: 900 }, handle: '#2A2A2A', rough: .5, price: 750000 },
+      { id: 'd_film', name: '화이트 필름 리폼 도어', spec: '기존 문짝·문틀 필름 시공 + 핸들 교체', color: '#EEECE7', handle: '#9A9A9A', rough: .5, price: 250000, tag: '예산 절감' },
+      { id: 'd_walnut', name: '월넛 필름 리폼 도어', spec: '기존 문짝 필름 시공', color: '#6E4D37', tex: { k: 'veneer', w: 900 }, handle: '#B8975A', rough: .5, price: 280000, tag: '예산 절감' },
+    ],
+  },
+  kitchen_lower: {
+    label: '주방 하부장', zone: '주방', where: 'ㄱ자 하부장 + 키큰장', unit: 'm', qty: 'klower',
+    items: [
+      { id: 'kl_cash', name: '캐시미어 그레이지 무광', spec: 'PET 무광 · 핸들리스 (J-그립)', color: '#CEC5B7', rough: .75, price: 1100000 },
+      { id: 'kl_oak', name: '내추럴 오크 무늬목', spec: '천연 무늬목 도어 · 핸들리스', color: '#BC9369', tex: { k: 'veneer', w: 600 }, rough: .6, price: 1450000, tag: '리얼 텍스처' },
+      { id: 'kl_sage', name: '세이지 그린 무광', spec: 'PET 무광 · 핸들리스', color: '#98A190', rough: .75, price: 1100000 },
+      { id: 'kl_espresso', name: '에스프레소 브라운', spec: 'PET 무광 · BM Silhouette 계열', color: '#57504C', rough: .7, price: 1100000, tag: 'BM 2026' },
+      { id: 'kl_navy', name: '딥 네이비 무광', spec: 'PET 무광', color: '#2F3A4A', rough: .7, price: 1100000 },
+      { id: 'kl_white', name: '화이트 무광 PET', spec: 'PET 무광 · 원톤', color: '#F0EEE9', rough: .7, price: 1000000, tag: '원톤' },
+    ],
+  },
+  kitchen_upper: {
+    label: '주방 상부장·키큰장', zone: '주방', where: '상부장 · 냉장고장', unit: 'm', qty: 'kupper',
+    items: [
+      { id: 'ku_white', name: '화이트 무광 PET', spec: '벽 동색 원톤 상부장', color: '#F0EEE9', rough: .7, price: 650000, tag: '원톤' },
+      { id: 'ku_cash', name: '캐시미어 그레이지 무광', spec: 'PET 무광', color: '#CEC5B7', rough: .75, price: 650000 },
+      { id: 'ku_oak', name: '내추럴 오크 무늬목', spec: '천연 무늬목', color: '#BC9369', tex: { k: 'veneer', w: 600 }, rough: .6, price: 850000 },
+      { id: 'ku_espresso', name: '에스프레소 브라운', spec: 'PET 무광', color: '#57504C', rough: .7, price: 650000 },
+    ],
+  },
+  countertop: {
+    label: '주방 상판', zone: '주방', where: 'ㄱ자 상판 (12T)', unit: 'm', qty: 'ctop',
+    items: [
+      { id: 'c_calacatta', name: '세라믹 · 칼라카타 화이트', spec: '세라믹 12T · 대리석 패턴', color: '#EDEBE6', tex: { k: 'tile', w: 1600, h: 3200, g: '#EDEBE6', vein: 'marble', nogrout: true }, rough: .25, price: 750000, tag: '세라믹 상판' },
+      { id: 'c_concrete', name: '세라믹 · 콘크리트 그레이', spec: '세라믹 12T · 무광', color: '#A9A6A0', tex: { k: 'tile', w: 1600, h: 3200, g: '#A9A6A0', vein: 'concrete', nogrout: true }, rough: .6, price: 700000 },
+      { id: 'c_trav', name: '세라믹 · 트래버틴 베이지', spec: '세라믹 12T · 석재 패턴', color: '#D4C5AE', tex: { k: 'tile', w: 1600, h: 3200, g: '#D4C5AE', vein: 'trav', nogrout: true }, rough: .45, price: 750000 },
+      { id: 'c_quartz', name: '엔지니어드 스톤 스노우', spec: '쿼츠 20T · 화이트', color: '#F2F1EE', tex: { k: 'tile', w: 1600, h: 3200, g: '#F2F1EE', vein: 'speck', nogrout: true }, rough: .3, price: 480000 },
+      { id: 'c_solid', name: '인조대리석 화이트', spec: '인조대리석 12T', color: '#F4F3F0', rough: .35, price: 280000, tag: '예산 절감' },
+    ],
+  },
+  backsplash: {
+    label: '주방 벽(백스플래시)', zone: '주방', where: '상·하부장 사이 벽', unit: '㎡', qty: 'wall',
+    items: [
+      { id: 'bs_slab', name: '상판 동일 세라믹 슬랩', spec: '상판과 일체 연출 · 줄눈 없음', color: 'ctop', rough: .3, price: 320000, tag: '슬랩 백스플래시' },
+      { id: 'bs_zellige', name: '젤리지 타일 화이트', spec: '수제 질감 65×200 · 유광', color: '#EEEAE2', tex: { k: 'brick', w: 65, h: 200, g: '#D8D2C8', vertical: false }, rough: .15, price: 190000 },
+      { id: 'bs_subway', name: '롱 서브웨이 그레이지', spec: '75×300 · 무광 · 스택본드', color: '#CFC6B8', tex: { k: 'brick', w: 75, h: 300, g: '#BDB4A6', stack: true }, rough: .5, price: 150000 },
+      { id: 'bs_glass', name: '백페인트 유리 (스노우)', spec: '5T 강화 · 무광 에칭', color: '#E9E7E2', rough: .25, price: 180000 },
+    ],
+  },
+  wall_kitchen: { label: '주방 벽', zone: '주방', where: '주방 기타 벽면', unit: '㎡', qty: 'wall', items: WALL_ITEMS },
+  floor_entry: {
+    label: '현관 바닥', zone: '현관', where: '현관 (단차 120mm)', unit: '㎡', qty: 'floor',
+    items: [
+      { id: 'e_terrazzo', name: '테라조 포세린 600×600', spec: '무광 · 미끄럼방지', color: '#D8D2C9', tex: { k: 'tile', w: 600, h: 600, g: '#C6BFB5', vein: 'terrazzo' }, rough: .55, price: 160000, tag: '테라조' },
+      { id: 'e_charcoal', name: '차콜 포세린 600×600', spec: '무광 · 오염 강함', color: '#4E4C4A', tex: { k: 'tile', w: 600, h: 600, g: '#3E3C3A', vein: 'stone' }, rough: .6, price: 140000 },
+      { id: 'e_hex', name: '헥사곤 타일 그레이지', spec: '200mm 헥사곤 · 무광', color: '#CFC8BD', tex: { k: 'hex', r: 115, g: '#B5AEA3' }, rough: .6, price: 150000 },
+      { id: 'e_trav', name: '트래버틴 포세린 600×1200', spec: '거실 아트월 연계', color: '#D6C9B5', tex: { k: 'tile', w: 600, h: 1200, g: '#C9BBA6', vein: 'trav' }, rough: .5, price: 160000 },
+    ],
+  },
+  shoe: {
+    label: '현관 신발장', zone: '현관', where: '키큰장 W 2.2m + 오픈 니치', unit: 'm', qty: 'shoe',
+    items: [
+      { id: 's_white', name: '화이트 플랫 (핸들리스)', spec: 'PET 무광 · 푸시 오픈 · 니치 LED', color: '#F0EEE9', rough: .7, price: 850000, tag: '원톤' },
+      { id: 's_oak', name: '내추럴 오크 무늬목', spec: '천연 무늬목 · 니치 LED', color: '#C29D72', tex: { k: 'veneer', w: 450 }, rough: .6, price: 1050000 },
+      { id: 's_tambour', name: '오크 템바 도어', spec: '템바 리브 도어 · 니치 LED', color: '#C29B6E', tex: { k: 'tambour', r: 22 }, rough: .6, price: 1150000 },
+      { id: 's_greige', name: '캐시미어 그레이지', spec: 'PET 무광', color: '#CEC5B7', rough: .75, price: 850000 },
+    ],
+  },
+  jungmun: {
+    label: '현관 중문', zone: '현관', where: 'W 1.5m', unit: '식', qty: 'one',
+    items: [
+      { id: 'j_slim3', name: '슬림 3연동 · 블랙 + 브론즈 유리', spec: '슬림 프레임 · 3연동 슬라이딩 · 무타공', color: '#1F1F1F', glass: '#8A7360', panels: 3, price: 2100000, tag: '개방감' },
+      { id: 'j_one', name: '원슬라이딩 · 화이트 + 투명', spec: '원슬라이딩 · 상부 레일', color: '#F2F0EC', glass: '#DCE3E6', panels: 1, price: 1650000, tag: '가성비' },
+      { id: 'j_swing', name: '스윙 중문 · 샴페인골드 + 플루티드', spec: '스윙 도어 · 단열·차음 유리', color: '#B59B6A', glass: '#E8E4DC', panels: 2, fluted: true, price: 2400000, tag: '단열' },
+      { id: 'j_none', name: '중문 없음', spec: '—', color: '#000', panels: 0, price: 0 },
+    ],
+  },
+  wall_master: { label: '안방 벽', zone: '침실', where: '안방·드레스룸', unit: '㎡', qty: 'wall', items: WALL_ITEMS },
+  wall_bed2: { label: '침실2 벽', zone: '침실', where: '자녀방', unit: '㎡', qty: 'wall', items: WALL_ITEMS },
+  wall_bed3: { label: '침실3 벽', zone: '침실', where: '서재·게스트룸', unit: '㎡', qty: 'wall', items: WALL_ITEMS },
+  closet: {
+    label: '붙박이장', zone: '침실', where: '안방·드레스룸·침실2·복도', unit: 'm', qty: 'closet',
+    items: [
+      { id: 'cl_white', name: '화이트 플랫 붙박이장', spec: '천장 일체 · 푸시 오픈 · 무손잡이', color: '#F0EEE9', rough: .7, price: 950000, tag: '원톤' },
+      { id: 'cl_cash', name: '캐시미어 그레이지', spec: 'PET 무광 · 슬림 바 핸들', color: '#CEC5B7', rough: .75, price: 950000 },
+      { id: 'cl_oak', name: '내추럴 오크 무늬목', spec: '천연 무늬목', color: '#BC9369', tex: { k: 'veneer', w: 450 }, rough: .6, price: 1250000 },
+      { id: 'cl_bronze', name: '브론즈 유리 도어', spec: '알루미늄 프레임 + 브론즈 유리 · 내부 LED', color: '#6E5A48', glassy: true, rough: .15, price: 1400000, tag: '쇼룸형' },
+      { id: 'cl_walnut', name: '월넛 무늬목', spec: '천연 무늬목', color: '#6E4D37', tex: { k: 'veneer', w: 450 }, rough: .55, price: 1250000 },
+    ],
+  },
+  bath_wall: {
+    label: '욕실 벽타일', zone: '욕실', where: '욕실 2개소 벽 전체', unit: '㎡', qty: 'wall',
+    items: [
+      { id: 'bw_warm', name: '웜화이트 포세린 600×1200', spec: '무광 · 덧방 불가 시 철거 후 시공', color: '#E9E4DB', tex: { k: 'tile', w: 600, h: 1200, g: '#D9D2C6', vein: 'stone' }, rough: .5, price: 115000, tag: '대형 포세린' },
+      { id: 'bw_trav', name: '베이지 트래버틴 600×1200', spec: '무광 · 석재 질감', color: '#D7C8B2', tex: { k: 'tile', w: 600, h: 1200, g: '#C8B9A2', vein: 'trav' }, rough: .5, price: 125000, tag: '베이지 트렌드' },
+      { id: 'bw_marble', name: '칼라카타 포세린 600×1200', spec: '유광 · 대리석 패턴', color: '#EEEBE6', tex: { k: 'tile', w: 600, h: 1200, g: '#DDD8D1', vein: 'marble' }, rough: .2, price: 125000 },
+      { id: 'bw_concrete', name: '웜그레이 콘크리트 600×1200', spec: '무광 · 호텔라이크', color: '#B6B0A7', tex: { k: 'tile', w: 600, h: 1200, g: '#A49E95', vein: 'concrete' }, rough: .6, price: 115000 },
+      { id: 'bw_mushroom', name: '머쉬룸 포세린 600×600', spec: '무광 · 웜 그레이 브라운', color: '#B9AA9A', tex: { k: 'tile', w: 600, h: 600, g: '#A8998A', vein: 'stone' }, rough: .55, price: 105000 },
+    ],
+  },
+  bath_floor: {
+    label: '욕실 바닥타일', zone: '욕실', where: '욕실 2개소 바닥', unit: '㎡', qty: 'floor',
+    items: [
+      { id: 'bf_greige', name: '그레이지 포세린 300×600', spec: '무광 논슬립 R11', color: '#B9B2A7', tex: { k: 'tile', w: 300, h: 600, g: '#A39C91', vein: 'stone' }, rough: .7, price: 130000 },
+      { id: 'bf_terrazzo', name: '테라조 300×300', spec: '무광 논슬립', color: '#D2CCC3', tex: { k: 'tile', w: 300, h: 300, g: '#BEB7AD', vein: 'terrazzo' }, rough: .7, price: 140000, tag: '테라조' },
+      { id: 'bf_charcoal', name: '차콜 포세린 300×600', spec: '무광 논슬립', color: '#4B4A48', tex: { k: 'tile', w: 300, h: 600, g: '#3B3A38', vein: 'stone' }, rough: .7, price: 130000 },
+      { id: 'bf_hex', name: '헥사곤 모자이크 화이트', spec: '논슬립 모자이크', color: '#E6E2DB', tex: { k: 'hex', r: 60, g: '#C9C3B9' }, rough: .6, price: 150000 },
+    ],
+  },
+  bath_fixture: {
+    label: '수전·액세서리', zone: '욕실', where: '수전·샤워·악세서리 컬러', unit: '식', qty: 'baths',
+    items: [
+      { id: 'fx_gun', name: '건메탈', spec: 'PVD 코팅 · 매립 수전', color: '#4A4A4C', metal: .9, rough: .35, price: 1300000, tag: '트렌드' },
+      { id: 'fx_gold', name: '브러시드 골드', spec: 'PVD 코팅 · 매립 수전', color: '#C2A26B', metal: 1, rough: .35, price: 1500000 },
+      { id: 'fx_black', name: '매트 블랙', spec: '분체 도장 · 노출 수전', color: '#1E1E1E', metal: .3, rough: .6, price: 1100000 },
+      { id: 'fx_chrome', name: '크롬', spec: '스탠다드 · 노출 수전', color: '#D9DCDF', metal: 1, rough: .12, price: 700000, tag: '가성비' },
+    ],
+  },
+  floor_balcony: {
+    label: '발코니 바닥', zone: '발코니', where: '발코니·다용도실', unit: '㎡', qty: 'floor',
+    items: [
+      { id: 'fb_grey', name: '웜그레이 포세린 300×600', spec: '무광 논슬립', color: '#A7A29A', tex: { k: 'tile', w: 300, h: 600, g: '#918C84', vein: 'concrete' }, rough: .7, price: 60000 },
+      { id: 'fb_terrazzo', name: '테라조 600×600', spec: '무광 논슬립', color: '#D2CCC3', tex: { k: 'tile', w: 600, h: 600, g: '#BEB7AD', vein: 'terrazzo' }, rough: .7, price: 75000 },
+      { id: 'fb_deck', name: '우드 패턴 포세린 200×1200', spec: '데크 연출 · 무광', color: '#A58462', tex: { k: 'wood', w: 200, l: 1200, v: .08, gap: 3 }, rough: .7, price: 70000 },
+    ],
+  },
+  wall_balcony: {
+    label: '발코니 벽', zone: '발코니', where: '발코니·다용도실 벽', unit: '㎡', qty: 'wall',
+    items: [
+      { id: 'wb_white', name: '탄성코트 화이트', spec: '결로·곰팡이 방지 탄성코트', color: '#F1F0EC', tex: { k: 'paper', p: 'orange' }, rough: .95, price: 15000 },
+      { id: 'wb_greige', name: '탄성코트 그레이지', spec: '결로·곰팡이 방지 탄성코트', color: '#D3CCC0', tex: { k: 'paper', p: 'orange' }, rough: .95, price: 15000 },
+    ],
+  },
+};
+
+const ZONES = ['공용부', '주방', '현관', '침실', '욕실', '발코니'];
+
+// ---------- 컨셉 프리셋 ----------
+const CONCEPTS = [
+  {
+    id: 'warm', name: '웜 미니멀 · 클라우드 댄서', en: 'Soft Minimal',
+    desc: 'Pantone 2026 클라우드 댄서를 바탕색으로 쓰고, 광폭 오크와 트래버틴으로 온기를 더한 컨셉. 무몰딩·무문선·무걸레받이의 "3무" 디테일로 선을 정리해 면이 넓어 보입니다.',
+    keys: ['Cloud Dancer', '광폭 오크', '3무 디테일', '트래버틴'],
+    pick: { floor_main: 'f_oak165', wall_living: 'w_cloud', wall_feature: 'a_trav', baseboard: 'b_minus', door: 'd_hidden', kitchen_lower: 'kl_cash', kitchen_upper: 'ku_white', countertop: 'c_calacatta', backsplash: 'bs_slab', wall_kitchen: 'w_cloud', floor_entry: 'e_trav', shoe: 's_white', jungmun: 'j_slim3', wall_master: 'w_linen', wall_bed2: 'w_warmsilk', wall_bed3: 'w_warmsilk', closet: 'cl_white', bath_wall: 'bw_warm', bath_floor: 'bf_greige', bath_fixture: 'fx_gun', floor_balcony: 'fb_grey', wall_balcony: 'wb_white' },
+    light: { k: 3000 },
+  },
+  {
+    id: 'japandi', name: '내추럴 재패니디', en: 'Natural Japandi',
+    desc: '라이트 오크 초광폭 마루에 템바보드와 오크 무늬목을 반복해 쓴 컨셉. 세이지 그린 주방과 라임워시 질감으로 차분한 휴식형 공간을 만듭니다.',
+    keys: ['초광폭 오크', '템바보드', '세이지 그린', '라임워시'],
+    pick: { floor_main: 'f_oakmax', wall_living: 'w_warmsilk', wall_feature: 'a_tambour', baseboard: 'b_tone', door: 'd_oak', kitchen_lower: 'kl_sage', kitchen_upper: 'ku_oak', countertop: 'c_trav', backsplash: 'bs_zellige', wall_kitchen: 'w_warmsilk', floor_entry: 'e_terrazzo', shoe: 's_tambour', jungmun: 'j_one', wall_master: 'w_limewash', wall_bed2: 'w_sage', wall_bed3: 'w_linen', closet: 'cl_oak', bath_wall: 'bw_trav', bath_floor: 'bf_terrazzo', bath_fixture: 'fx_black', floor_balcony: 'fb_deck', wall_balcony: 'wb_greige' },
+    light: { k: 2700 },
+  },
+  {
+    id: 'mid', name: '모던 미드센추리 · 실루엣', en: 'Modern Mid-Century',
+    desc: '월넛 헤링본과 BM 2026 실루엣(딥 브라운)을 묶은 컨셉. 다크 우드 쪽으로 옮겨가는 흐름을 반영했고, 브러시드 골드와 카키로 깊이를 더합니다.',
+    keys: ['헤링본', 'Silhouette', '월넛', 'Universal Khaki'],
+    pick: { floor_main: 'f_herring', wall_living: 'w_warmsilk', wall_feature: 'a_walnut', baseboard: 'b_wood', door: 'd_walnut', kitchen_lower: 'kl_espresso', kitchen_upper: 'ku_white', countertop: 'c_calacatta', backsplash: 'bs_subway', wall_kitchen: 'w_warmsilk', floor_entry: 'e_charcoal', shoe: 's_oak', jungmun: 'j_swing', wall_master: 'w_khaki', wall_bed2: 'w_dustyblue', wall_bed3: 'w_butter', closet: 'cl_walnut', bath_wall: 'bw_mushroom', bath_floor: 'bf_charcoal', bath_fixture: 'fx_gold', floor_balcony: 'fb_terrazzo', wall_balcony: 'wb_white' },
+    light: { k: 2700 },
+  },
+  {
+    id: 'hotel', name: '호텔라이크 그레이지', en: 'Hotel-like Greige',
+    desc: '전 실 600×1200 포세린 바닥과 칼라카타 슬랩 아트월로 호텔 라운지 분위기를 낸 컨셉. 콘크리트 그레이 욕실과 브론즈 유리 붙박이장으로 대비를 줍니다.',
+    keys: ['포세린 바닥', '칼라카타', '브론즈 유리', '건메탈'],
+    pick: { floor_main: 'f_porc', wall_living: 'w_greige', wall_feature: 'a_calacatta', baseboard: 'b_minus', door: 'd_greige', kitchen_lower: 'kl_navy', kitchen_upper: 'ku_cash', countertop: 'c_concrete', backsplash: 'bs_slab', wall_kitchen: 'w_greige', floor_entry: 'e_charcoal', shoe: 's_greige', jungmun: 'j_slim3', wall_master: 'w_greige', wall_bed2: 'w_warmsilk', wall_bed3: 'w_greige', closet: 'cl_bronze', bath_wall: 'bw_concrete', bath_floor: 'bf_charcoal', bath_fixture: 'fx_gun', floor_balcony: 'fb_grey', wall_balcony: 'wb_greige' },
+    light: { k: 3500 },
+  },
+  {
+    id: 'value', name: '실속 화이트 (예산형)', en: 'Value White',
+    desc: '바꾸기 어려운 공정(욕실·주방·바닥)은 제대로 하고, 도어는 필름 리폼, 벽은 실크벽지, 상판은 인조대리석으로 단가를 낮춘 컨셉. 샷시 교체를 빼면 시장 평균 범위에 들어옵니다.',
+    keys: ['필름 리폼', '실크벽지', '인조대리석', '화이트 원톤'],
+    pick: { floor_main: 'f_oak165', wall_living: 'w_warmsilk', wall_feature: 'a_plain', baseboard: 'b_white', door: 'd_film', kitchen_lower: 'kl_white', kitchen_upper: 'ku_white', countertop: 'c_solid', backsplash: 'bs_subway', wall_kitchen: 'w_warmsilk', floor_entry: 'e_hex', shoe: 's_white', jungmun: 'j_one', wall_master: 'w_warmsilk', wall_bed2: 'w_warmsilk', wall_bed3: 'w_warmsilk', closet: 'cl_white', bath_wall: 'bw_warm', bath_floor: 'bf_greige', bath_fixture: 'fx_chrome', floor_balcony: 'fb_grey', wall_balcony: 'wb_white' },
+    light: { k: 3000 },
+  },
+];
+
+// ---------- 견적: 고정 공정 (추정) ----------
+const FIXED_COSTS = [
+  { k: 'demo', name: '가설·보양·철거·폐기물', amt: 4200000, note: '전체 철거(마루·욕실·주방·도어) 기준' },
+  { k: 'mep', name: '설비·방수 (욕실 제외)', amt: 1800000, note: '급배수 일부 교체, 발코니 방수' },
+  { k: 'elec', name: '전기·조명 기본', amt: 5200000, note: '매립등 교체, 스위치·콘센트 전면 교체' },
+  { k: 'wood', name: '목공 (천장 평탄화·커튼박스·문틀)', amt: 6500000, note: '3무 디테일 시 난이도 상승분은 걸레받이·도어 단가에 반영' },
+  { k: 'ceiling', name: '천장 도배', amt: 0, perM2: 15000, note: '실크 화이트 · 천장 면적 × 단가' },
+  { k: 'bathpkg', name: '욕실 기본 (방수·도기·천장재·젠다이)', amt: 0, perBath: 3000000, note: '1개소당 · 타일·수전은 별도 항목' },
+  { k: 'clean', name: '입주청소·후드/배관 청소', amt: 700000, note: '' },
+];
+const OPTION_COSTS = {
+  sash: { name: '샷시 전체 교체 (하이샷시·로이유리)', amt: 12000000, note: '노후도·브랜드에 따라 500만~1,500만 원' },
+  expand: { name: '거실 발코니 확장 (단열·바닥난방 연장)', amt: 4500000, note: '관리주체 행위허가 필요' },
+  dress: { name: '드레스룸 구획 가벽·아치 개구부', amt: 1400000, note: '' },
+  cove: { name: '간접조명 (거실 우물천장·라인조명·니치)', amt: 1800000, note: '' },
+};
+const MGMT_RATE = 0.08;
+
+// ---------- 출처 ----------
+const SOURCES = [
+  ['Pantone 2026 Cloud Dancer (11-4201)', 'https://hospitalitydesign.com/news/pantone-color-of-the-year-2026/186006'],
+  ['Benjamin Moore 2026 Silhouette', 'https://www.homesandgardens.com/interior-design/paint/benjamin-moore-color-of-the-year-2026'],
+  ['2026 Paint Color of the Year 종합 (SW Universal Khaki 등)', 'https://paintdb.com/blog/2026-paint-color-of-the-year-roundup'],
+  ['Dulux 2026 Rhythm of Blues', 'https://www.dezeen.com/2025/09/09/rhythm-of-blues-dulux-colour-of-the-year-2026/'],
+  ['3무(무몰딩·무문선·무걸레받이) 인테리어 — 세계일보 2026.06', 'https://www.segye.com/newsView/20260608518470'],
+  ['동화자연마루 2026 광폭 강마루 리뉴얼 — 헤럴드경제', 'https://www.heraldk.com/article/2026040923275446998'],
+  ['한샘 165 프리미엄 강마루 매출 98% 증가 — 한국경제 2026.07', 'https://www.hankyung.com/article/202607243312P'],
+  ['현대리바트 원톤 인테리어 — 뉴스1 2026.08', 'https://www.news1.kr/amp/industry/sb-founded/6248163'],
+  ['LX Z:IN 플래그십 구축 리모델링 전시 — MTN 2026.09', 'https://news.mtn.co.kr/news-detail/2026090113231925540'],
+  ['2026 소프트 미니멀리즘 트렌드 — VOGUE Korea', 'https://www.vogue.co.kr/?p=741022'],
+  ['아파트 리모델링 평당 비용 (2026.06 갱신) — 아정당', 'https://www.ajd.co.kr/contents/basic-tip/detail/%ED%98%84%EC%9E%A5_%EC%97%85%EC%9E%90%EA%B0%80_%EC%95%8C%EB%A0%A4%EB%93%9C%EB%A6%AC%EB%8A%94_%EC%95%84%ED%8C%8C%ED%8A%B8_%EB%A6%AC%EB%AA%A8%EB%8D%B8%EB%A7%81_%EB%B9%84%EC%9A%A9_%ED%8F%89%EB%8B%B9_%EA%B0%80%EA%B2%A9!-50541'],
+  ['중문 원슬라이딩 vs 3연동 비용', 'https://glasswallet.com/calculate/middle-door-cost/one-slide-vs-three-slide'],
+  ['Flooring trends 2026 — Livingetc', 'https://www.livingetc.com/ideas/flooring-trends-for-2026'],
+  ['Lighting trends 2026 — Livingetc', 'https://www.livingetc.com/ideas/lighting-trends-2026'],
+];
+
+// ============================================================
+//  TEXTURES : 캔버스 절차적 텍스처 (외부 이미지 없이 생성)
+//  반환: { canvas, size:[u_m, v_m] }  — 텍스처 1장이 덮는 실제 크기(m)
+// ============================================================
+
+function rng(seed) {
+  let a = seed >>> 0;
+  return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+}
+function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function hexToRgb(h) { const n = parseInt(h.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+function rgbStr(r, g, b, a = 1) { return `rgba(${r | 0},${g | 0},${b | 0},${a})`; }
+function shade(hex, f) { // f: -1..1 밝기 조절
+  const [r, g, b] = hexToRgb(hex);
+  const t = f < 0 ? 0 : 255, p = Math.abs(f);
+  return rgbStr(r + (t - r) * p, g + (t - g) * p, b + (t - b) * p);
+}
+function mkCanvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+
+function noise(ctx, w, h, amt, R, scale = 1) {
+  const img = ctx.getImageData(0, 0, w, h), d = img.data;
+  for (let i = 0; i < d.length; i += 4) { const n = (R() - .5) * amt * scale; d[i] += n; d[i + 1] += n; d[i + 2] += n; }
+  ctx.putImageData(img, 0, 0);
+}
+
+// 나뭇결 한 판 그리기 (x,y,w,h, 결 방향: 'v' 세로 / 'h' 가로)
+function drawPlank(ctx, x, y, w, h, base, v, R, dir = 'v') {
+  ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+  ctx.fillStyle = shade(base, (R() - .5) * 2 * v); ctx.fillRect(x, y, w, h);
+  const along = dir === 'v' ? h : w, across = dir === 'v' ? w : h;
+  const lines = 10 + (R() * 10 | 0);
+  for (let i = 0; i < lines; i++) {
+    const off = R() * across, amp = 1 + R() * across * .06, freq = (1 + R() * 3) / along * Math.PI * 2, ph = R() * 6;
+    ctx.strokeStyle = R() < .5 ? 'rgba(60,35,15,' + (.04 + R() * .08) + ')' : 'rgba(255,240,220,' + (.03 + R() * .05) + ')';
+    ctx.lineWidth = .5 + R() * 1.6; ctx.beginPath();
+    for (let s = 0; s <= along; s += 6) {
+      const o = off + Math.sin(s * freq + ph) * amp;
+      if (dir === 'v') { s === 0 ? ctx.moveTo(x + o, y + s) : ctx.lineTo(x + o, y + s); }
+      else { s === 0 ? ctx.moveTo(x + s, y + o) : ctx.lineTo(x + s, y + o); }
+    }
+    ctx.stroke();
+  }
+  // 옹이 (드물게)
+  if (R() < .25) {
+    const kx = dir === 'v' ? x + R() * w : x + R() * w, ky = dir === 'v' ? y + R() * h : y + R() * h;
+    const g = ctx.createRadialGradient(kx, ky, 0, kx, ky, across * .18);
+    g.addColorStop(0, 'rgba(70,40,20,.35)'); g.addColorStop(1, 'rgba(70,40,20,0)');
+    ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
+  }
+  ctx.restore();
+}
+
+const TEX = {
+  wood(t, color, seed) {
+    const R = rng(seed);
+    const cols = 4, pxPerM = 640;
+    const W = Math.round(cols * t.w / 1000 * pxPerM), H = Math.round(t.l / 1000 * pxPerM);
+    const c = mkCanvas(W, H), ctx = c.getContext('2d');
+    const pw = W / cols, offs = [0, .5, .25, .75];
+    for (let i = 0; i < cols; i++) {
+      const o = offs[i] * H;
+      for (const y0 of [o - H, o]) drawPlank(ctx, i * pw, y0, pw, H, color, t.v, R, 'v');
+      ctx.fillStyle = 'rgba(40,25,10,.45)';
+      ctx.fillRect(i * pw, 0, t.gap ? t.gap : 1.4, H);
+      ctx.fillRect(i * pw, o, pw, t.gap ? t.gap : 1.4);
+    }
+    noise(ctx, W, H, 10, R);
+    return { canvas: c, size: [cols * t.w / 1000, t.l / 1000] };
+  },
+  herring(t, color, seed) {
+    const R = rng(seed);
+    const L = t.l, w = t.w, k = Math.round(L / w), P = 2 * L, S = 1024 / P;
+    const c = mkCanvas(1024, 1024), ctx = c.getContext('2d');
+    ctx.fillStyle = color; ctx.fillRect(0, 0, 1024, 1024);
+    const pieceCol = {};
+    for (let b = -4; b <= 4; b++) for (let n = -4 * k; n <= 4 * k; n++) {
+      const ox = (n * w + b * L) * S, oy = (n * w - b * L) * S;
+      if (ox > 1100 || oy > 1100 || ox + (L + w) * S < -50 || oy + (L + w) * S < -50) continue;
+      const key = ((n - k * b) % (2 * k) + 2 * k) % (2 * k);
+      const R2 = rng(seed + key * 131);
+      drawPlank(ctx, ox, oy, L * S, w * S, color, t.v, R2, 'h');
+      const R3 = rng(seed + key * 131 + 77);
+      drawPlank(ctx, ox, oy + w * S, w * S, L * S, color, t.v, R3, 'v');
+      ctx.strokeStyle = 'rgba(40,25,10,.5)'; ctx.lineWidth = 1.2;
+      ctx.strokeRect(ox, oy, L * S, w * S); ctx.strokeRect(ox, oy + w * S, w * S, L * S);
+    }
+    noise(ctx, 1024, 1024, 8, R);
+    return { canvas: c, size: [P / 1000, P / 1000], rotate: Math.PI / 4 };
+  },
+  tile(t, color, seed) {
+    const R = rng(seed);
+    const nx = t.nogrout ? 1 : 2, ny = t.nogrout ? 1 : 2;
+    const sizeU = nx * t.w / 1000, sizeV = ny * t.h / 1000;
+    const pxPerM = Math.min(1024 / sizeU, 1024 / sizeV, 900);
+    const W = Math.round(sizeU * pxPerM), H = Math.round(sizeV * pxPerM);
+    const c = mkCanvas(W, H), ctx = c.getContext('2d');
+    const tw = W / nx, th = H / ny;
+    for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) {
+      const x = i * tw, y = j * th;
+      ctx.save(); ctx.beginPath(); ctx.rect(x, y, tw, th); ctx.clip();
+      ctx.fillStyle = shade(color, (R() - .5) * .04); ctx.fillRect(x, y, tw, th);
+      VEIN[t.vein || 'stone'](ctx, x, y, tw, th, color, R);
+      ctx.restore();
+    }
+    noise(ctx, W, H, t.vein === 'concrete' ? 14 : 6, R);
+    if (!t.nogrout) {
+      ctx.fillStyle = t.g; const gw = Math.max(1.5, 2.5 * pxPerM / 1000);
+      for (let i = 0; i < nx; i++) ctx.fillRect(i * tw, 0, gw, H);
+      for (let j = 0; j < ny; j++) ctx.fillRect(0, j * th, W, gw);
+    }
+    return { canvas: c, size: [sizeU, sizeV] };
+  },
+  hex(t, color, seed) {
+    const R = rng(seed);
+    const r = t.r, pxPerM = 1400;
+    const Wm = Math.sqrt(3) * r / 1000 * 2, Hm = 3 * r / 1000;
+    const W = Math.round(Wm * pxPerM), H = Math.round(Hm * pxPerM), rp = r / 1000 * pxPerM;
+    const c = mkCanvas(W, H), ctx = c.getContext('2d');
+    ctx.fillStyle = t.g; ctx.fillRect(0, 0, W, H);
+    const dx = Math.sqrt(3) * rp, gw = Math.max(1.5, rp * .04);
+    for (let j = -1; j <= 3; j++) for (let i = -1; i <= 3; i++) {
+      const cx = i * dx + (j % 2 ? dx / 2 : 0), cy = j * 1.5 * rp;
+      ctx.beginPath();
+      for (let a = 0; a < 6; a++) { const ang = Math.PI / 6 + a * Math.PI / 3; const px = cx + Math.cos(ang) * (rp - gw), py = cy + Math.sin(ang) * (rp - gw); a ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
+      ctx.closePath(); ctx.fillStyle = shade(color, (R() - .5) * .06); ctx.fill();
+    }
+    noise(ctx, W, H, 6, R);
+    return { canvas: c, size: [Wm, Hm] };
+  },
+  brick(t, color, seed) { // 서브웨이·젤리지 (가로로 긴 타일)
+    const R = rng(seed);
+    const tw = t.h, th = t.w; // 가로 길이 h, 세로 높이 w
+    const cols = 2, rows = 6, pxPerM = 1600;
+    const Wm = cols * tw / 1000, Hm = rows * th / 1000;
+    const W = Math.round(Wm * pxPerM), H = Math.round(Hm * pxPerM);
+    const c = mkCanvas(W, H), ctx = c.getContext('2d');
+    ctx.fillStyle = t.g; ctx.fillRect(0, 0, W, H);
+    const pw = W / cols, ph = H / rows, gw = 2.5;
+    for (let r = 0; r < rows; r++) {
+      const off = t.stack ? 0 : (r % 2) * pw / 2;
+      for (let i = -1; i <= cols; i++) {
+        const x = i * pw + off, y = r * ph;
+        const g = ctx.createLinearGradient(x, y, x, y + ph);
+        const base = shade(color, (R() - .5) * (t.stack ? .05 : .14));
+        g.addColorStop(0, base); g.addColorStop(.5, shade(color, (R() - .3) * .1)); g.addColorStop(1, base);
+        ctx.fillStyle = g; ctx.fillRect(x + gw, y + gw, pw - gw, ph - gw);
+      }
+    }
+    noise(ctx, W, H, 8, R);
+    return { canvas: c, size: [Wm, Hm] };
+  },
+  paper(t, color, seed) {
+    const R = rng(seed), S = 256;
+    const c = mkCanvas(S, S), ctx = c.getContext('2d');
+    ctx.fillStyle = color; ctx.fillRect(0, 0, S, S);
+    if (t.p === 'linen') {
+      for (let i = 0; i < S; i += 2) {
+        ctx.fillStyle = `rgba(0,0,0,${R() * .05})`; ctx.fillRect(0, i, S, 1);
+        ctx.fillStyle = `rgba(255,255,255,${R() * .05})`; ctx.fillRect(i, 0, 1, S);
+      }
+      noise(ctx, S, S, 10, R);
+    } else if (t.p === 'orange') noise(ctx, S, S, 16, R);
+    else noise(ctx, S, S, 5, R);
+    return { canvas: c, size: [.25, .25] };
+  },
+  lime(t, color, seed) {
+    const R = rng(seed), S = 512;
+    const c = mkCanvas(S, S), ctx = c.getContext('2d');
+    ctx.fillStyle = color; ctx.fillRect(0, 0, S, S);
+    for (let i = 0; i < 140; i++) {
+      const x = R() * S, y = R() * S, rr = 40 + R() * 120;
+      for (const dx of [-S, 0, S]) for (const dy of [-S, 0, S]) {
+        const g = ctx.createRadialGradient(x + dx, y + dy, 0, x + dx, y + dy, rr);
+        const a = R() * .07, l = R() < .5;
+        g.addColorStop(0, l ? `rgba(255,255,255,${a})` : `rgba(80,60,40,${a})`); g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = g; ctx.fillRect(0, 0, S, S);
+      }
+    }
+    noise(ctx, S, S, 6, R);
+    return { canvas: c, size: [1.6, 1.6] };
+  },
+  tambour(t, color, seed) {
+    const R = rng(seed), W = 512, H = 1024;
+    const c = mkCanvas(W, H), ctx = c.getContext('2d');
+    drawPlank(ctx, 0, 0, W, H, color, .03, R, 'v');
+    const n = 16, rw = W / n;
+    for (let i = 0; i < n; i++) {
+      const g = ctx.createLinearGradient(i * rw, 0, (i + 1) * rw, 0);
+      g.addColorStop(0, 'rgba(0,0,0,.38)'); g.addColorStop(.18, 'rgba(255,255,255,.10)');
+      g.addColorStop(.5, 'rgba(255,255,255,.16)'); g.addColorStop(.85, 'rgba(0,0,0,.06)'); g.addColorStop(1, 'rgba(0,0,0,.35)');
+      ctx.fillStyle = g; ctx.fillRect(i * rw, 0, rw, H);
+    }
+    return { canvas: c, size: [n * t.r / 1000, n * t.r / 1000 * 2] };
+  },
+  veneer(t, color, seed) {
+    const R = rng(seed), W = 512, H = 1024;
+    const c = mkCanvas(W, H), ctx = c.getContext('2d');
+    drawPlank(ctx, 0, 0, W, H, color, .04, R, 'v');
+    // 플랫컷 무늬 (산형)
+    for (let i = 0; i < 9; i++) {
+      ctx.strokeStyle = `rgba(60,35,15,${.05 + R() * .07})`; ctx.lineWidth = 1 + R() * 2;
+      const cx = W * (.3 + R() * .4), top = H * (.1 + i * .1);
+      ctx.beginPath(); ctx.moveTo(cx - W * .45, H); ctx.quadraticCurveTo(cx, top - 300, cx + W * .45, H); ctx.stroke();
+    }
+    ctx.fillStyle = 'rgba(30,20,10,.5)'; ctx.fillRect(0, 0, 2, H);
+    noise(ctx, W, H, 8, R);
+    return { canvas: c, size: [t.w / 1000, t.w / 1000 * 2] };
+  },
+};
+
+// ---------- 석재 무늬 ----------
+const VEIN = {
+  stone(ctx, x, y, w, h, color, R) {
+    for (let i = 0; i < 60; i++) {
+      const px = x + R() * w, py = y + R() * h, rr = 10 + R() * w * .2;
+      const g = ctx.createRadialGradient(px, py, 0, px, py, rr);
+      const a = R() * .022; g.addColorStop(0, R() < .5 ? `rgba(255,255,255,${a})` : `rgba(90,75,60,${a})`); g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
+    }
+  },
+  concrete(ctx, x, y, w, h, color, R) {
+    VEIN.stone(ctx, x, y, w, h, color, R);
+    for (let i = 0; i < 120; i++) { ctx.fillStyle = `rgba(40,40,40,${R() * .25})`; const s = R() * 2.5; ctx.beginPath(); ctx.arc(x + R() * w, y + R() * h, s, 0, 7); ctx.fill(); }
+  },
+  marble(ctx, x, y, w, h, color, R) {
+    VEIN.stone(ctx, x, y, w, h, color, R);
+    const veins = 3 + (R() * 4 | 0);
+    for (let v = 0; v < veins; v++) {
+      let px = x + R() * w, py = y - 20, ang = Math.PI / 2 + (R() - .5) * 1.2;
+      const main = R() < .45, pts = [[px, py]];
+      while (py < y + h + 20 && pts.length < 400) { ang += (R() - .5) * .5; px += Math.cos(ang) * 8; py += Math.abs(Math.sin(ang)) * 8 + 1; pts.push([px, py]); }
+      for (const [lw, a] of main ? [[7, .05], [3, .12], [1.2, .35]] : [[3, .05], [1, .2]]) {
+        ctx.strokeStyle = `rgba(120,110,100,${a})`; ctx.lineWidth = lw; ctx.beginPath();
+        pts.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.stroke();
+      }
+      if (main) { ctx.strokeStyle = 'rgba(170,140,90,.25)'; ctx.lineWidth = 1; ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(p[0] + 3, p[1]) : ctx.moveTo(p[0] + 3, p[1])); ctx.stroke(); }
+    }
+  },
+  trav(ctx, x, y, w, h, color, R) {
+    VEIN.stone(ctx, x, y, w, h, color, R);
+    for (let i = 0; i < 70; i++) {
+      const yy = y + R() * h, a = R() * .09;
+      ctx.fillStyle = R() < .5 ? `rgba(255,250,240,${a})` : `rgba(120,95,65,${a})`;
+      ctx.fillRect(x, yy, w, 1 + R() * 6);
+    }
+    for (let i = 0; i < 90; i++) { ctx.fillStyle = `rgba(110,90,65,${.15 + R() * .2})`; ctx.beginPath(); ctx.ellipse(x + R() * w, y + R() * h, 1 + R() * 5, .6 + R() * 1.5, 0, 0, 7); ctx.fill(); }
+  },
+  terrazzo(ctx, x, y, w, h, color, R) {
+    const chips = ['#8C8378', '#B9A58C', '#6E6A66', '#E9E4DC', '#A88F77', '#C9C1B5', '#7E7468'];
+    for (let i = 0; i < w * h / 160; i++) {
+      ctx.fillStyle = chips[R() * chips.length | 0];
+      const cx = x + R() * w, cy = y + R() * h, s = 1.5 + R() * R() * 14, n = 4 + (R() * 3 | 0);
+      ctx.beginPath();
+      for (let k = 0; k < n; k++) { const a = k / n * 6.28 + R() * .6, rr = s * (.6 + R() * .5); k ? ctx.lineTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr) : ctx.moveTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr); }
+      ctx.closePath(); ctx.fill();
+    }
+  },
+  speck(ctx, x, y, w, h, color, R) {
+    for (let i = 0; i < w * h / 90; i++) { ctx.fillStyle = `rgba(${R() < .5 ? '90,90,90' : '200,200,200'},${R() * .5})`; ctx.fillRect(x + R() * w, y + R() * h, 1.5, 1.5); }
+  },
+};
+
+function makeTexCanvas(item) {
+  if (!item.tex || item.tex.k === 'paint') return null;
+  const seed = hashStr(item.id);
+  return TEX[item.tex.k](item.tex, item.color, seed);
+}
+
+// ============================================================
+//  SCENE : Three.js 3D 모델 생성 (평면 데이터 → 벽·바닥·개구부·가구·조명)
+// ============================================================
+
+const H = PLAN_META.ceiling, DOOR_H = PLAN_META.doorH, T = PLAN_META.wallT, HALF = T / 2;
+const CX = 5985, CZ = 9100;
+const WX = x => (x - CX) / 1000, WZ = z => (z - CZ) / 1000;
+
+const state = {
+  sel: { ...CONCEPTS[0].pick }, concept: 'warm',
+  expand: false, dress: true, cutaway: false, ceiling: false,
+  sash: true, cove: true, vat: false,
+  light: 'day', kelvin: 3000, view: 'orbit',
+};
+try { const s = JSON.parse(localStorage.getItem('sim33-state') || 'null'); if (s && s.sel) { Object.assign(state, s, { view: 'orbit' }); for (const k in CATALOG) if (!CATALOG[k].items.some(i => i.id === state.sel[k])) state.sel[k] = CONCEPTS[0].pick[k]; } } catch (e) { }
+function saveState() { try { localStorage.setItem('sim33-state', JSON.stringify(state)); } catch (e) { } }
+
+// ---------- 렌더러 ----------
+const viewport = document.getElementById('viewport');
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+viewport.prepend(renderer.domElement);
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+const camera = new THREE.PerspectiveCamera(40, 1, 0.05, 300);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = .08;
+controls.maxPolarAngle = Math.PI * .495; controls.minDistance = 3; controls.maxDistance = 45;
+controls.screenSpacePanning = true;
+function setOrbitHome() { const a = Math.max(viewport.clientWidth, 1) / Math.max(viewport.clientHeight, 1), k = a < 1.2 ? Math.min(1.9, 1.2 / a * .95) : 1; camera.fov = 40; camera.position.set(7.5 * k, 15.5 * k, 15 * k); controls.target.set(0, 0, .3); camera.updateProjectionMatrix(); controls.update(); }
+setOrbitHome();
+
+// ---------- 조명 ----------
+const hemi = new THREE.HemisphereLight('#fdfbf7', '#c9bfb1', .9); scene.add(hemi);
+const sun = new THREE.DirectionalLight('#fff4e5', 2.4);
+sun.position.set(5, 14, 11); sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -.0004; sun.shadow.normalBias = .02;
+Object.assign(sun.shadow.camera, { left: -11, right: 11, top: 11, bottom: -11, near: 1, far: 50 });
+scene.add(sun); scene.add(sun.target);
+
+function kelvinRGB(k) {
+  const t = k / 100; let r, g, b;
+  r = t <= 66 ? 255 : 329.7 * Math.pow(t - 60, -.1332);
+  g = t <= 66 ? 99.47 * Math.log(t) - 161.12 : 288.12 * Math.pow(t - 60, -.0755);
+  b = t >= 66 ? 255 : t <= 19 ? 0 : 138.52 * Math.log(t - 10) - 305.04;
+  const c = v => Math.max(0, Math.min(255, v)) / 255;
+  return new THREE.Color(c(r), c(g), c(b));
+}
+
+// ---------- 재질 ----------
+const slotMat = {}, texCache = {};
+function getMat(slot) { return slotMat[slot] || (slotMat[slot] = new THREE.MeshStandardMaterial({ color: '#fff' })); }
+function itemOf(slot) { const c = CATALOG[slot]; return c.items.find(i => i.id === state.sel[slot]) || c.items[0]; }
+function texFor(item) {
+  if (item.id in texCache) return texCache[item.id];
+  const r = makeTexCanvas(item);
+  if (!r) return (texCache[item.id] = null);
+  const mk = (cs) => {
+    const t = new THREE.CanvasTexture(r.canvas);
+    t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = cs;
+    t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+    t.repeat.set(1 / r.size[0], 1 / r.size[1]);
+    if (r.rotate) { t.rotation = r.rotate; }
+    return t;
+  };
+  const bumpy = ['tile', 'tambour', 'hex', 'brick', 'herring', 'wood', 'veneer', 'lime'].includes(item.tex.k);
+  return (texCache[item.id] = { map: mk(THREE.SRGBColorSpace), bump: bumpy ? mk(THREE.NoColorSpace) : null, canvas: r.canvas });
+}
+function resolveItem(slot) {
+  const it = itemOf(slot);
+  if (it.color === 'ctop') { const c = itemOf('countertop'); return { ...c, rough: it.rough }; }
+  return it;
+}
+function applySlot(slot) {
+  const it = resolveItem(slot), m = getMat(slot), t = texFor(it);
+  m.map = t ? t.map : null;
+  m.bumpMap = t ? t.bump : null; m.bumpScale = it.tex && it.tex.k === 'tambour' ? 3 : 1.2;
+  m.color.set(t ? '#ffffff' : /^#/.test(it.color) ? it.color : '#ffffff');
+  m.roughness = it.rough ?? .7; m.metalness = it.metal ?? (it.glassy ? .35 : 0);
+  m.envMapIntensity = it.glassy ? 1.6 : 1;
+  m.needsUpdate = true;
+}
+function applyAll() { for (const k in CATALOG) applySlot(k); }
+
+const FM = {}; // 고정 재질
+function fm(key, color, rough = .8, metal = 0, extra = {}) { return FM[key] || (FM[key] = new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: metal, ...extra })); }
+const MAT = {
+  ext: () => fm('ext', '#d7d3cc', .95), cap: () => fm('cap', '#34312e', .9), plaster: () => fm('plaster', '#e4e0da', .95),
+  ceiling: () => fm('ceil', '#f7f6f3', .95), sash: () => fm('sash', '#ecebe8', .5),
+  glass: () => fm('glass', '#cfdde3', .05, 0, { transparent: true, opacity: .16, depthWrite: false, envMapIntensity: 2 }),
+  carcass: () => fm('carc', '#2c2926', .9),
+  boucle: () => fm('boucle', '#e5dfd3', 1), fabric2: () => fm('fab2', '#b9a68e', 1), linen: () => fm('linen', '#efebe4', 1),
+  oakF: () => fm('oakF', '#b48a5e', .55), walnutF: () => fm('walF', '#5e412e', .5), black: () => fm('blk', '#1c1c1c', .45, .4),
+  tv: () => fm('tv', '#0b0b0c', .25, .2), ceramic: () => fm('cer', '#f6f5f2', .15), steel: () => fm('steel', '#c9cbcc', .3, 1),
+  rug: () => fm('rug', '#d6ccbd', 1), plant: () => fm('plant', '#5a7150', .8), pot: () => fm('pot', '#c8bba9', .9),
+  entryDoor: () => fm('edoor', '#3d3f42', .5, .3), appliance: () => fm('app', '#e9e9e6', .4),
+  led: () => fm('led', '#f3f0ea', 1, 0, { emissive: '#ffd9a8', emissiveIntensity: 0 }),
+};
+
+// ---------- 지오메트리 헬퍼 ----------
+function worldUV(g) {
+  const p = g.attributes.position, n = g.attributes.normal, uv = g.attributes.uv;
+  for (let i = 0; i < p.count; i++) {
+    const nx = Math.abs(n.getX(i)), ny = Math.abs(n.getY(i));
+    if (nx > .5) uv.setXY(i, p.getZ(i), p.getY(i));
+    else if (ny > .5) uv.setXY(i, p.getX(i), -p.getZ(i));
+    else uv.setXY(i, p.getX(i), p.getY(i));
+  }
+  uv.needsUpdate = true;
+}
+// mm 좌표 박스
+function box(parent, x1, z1, x2, z2, y1, y2, mat, o = {}) {
+  const [ax, bx] = x1 < x2 ? [x1, x2] : [x2, x1], [az, bz] = z1 < z2 ? [z1, z2] : [z2, z1];
+  const g = new THREE.BoxGeometry(Math.max(1, bx - ax) / 1000, Math.max(1, y2 - y1) / 1000, Math.max(1, bz - az) / 1000);
+  g.translate(WX((ax + bx) / 2), (y1 + y2) / 2000, WZ((az + bz) / 2));
+  worldUV(g);
+  const m = new THREE.Mesh(g, mat);
+  m.castShadow = o.cast ?? true; m.receiveShadow = true;
+  if (o.slot) m.userData.slot = o.slot; if (o.room) m.userData.room = o.room; if (o.nopick) m.userData.nopick = true;
+  parent.add(m); return m;
+}
+function cyl(parent, x, z, r, y1, y2, mat, seg = 24, o = {}) {
+  const g = new THREE.CylinderGeometry(r / 1000, (o.r2 ?? r) / 1000, (y2 - y1) / 1000, seg);
+  g.translate(WX(x), (y1 + y2) / 2000, WZ(z));
+  const m = new THREE.Mesh(g, mat); m.castShadow = true; m.receiveShadow = true;
+  if (o.slot) m.userData.slot = o.slot; parent.add(m); return m;
+}
+
+let ROOMS = [], OPEN = [], root, vertical, ceilGroup, uppers, furn, ledMeshes = [], roomLights = [];
+let qty = {};
+function roomAt(x, z) { return ROOMS.find(r => x > r.x1 && x < r.x2 && z > r.z1 && z < r.z2); }
+function subtract(segs, a, b) { const out = []; for (const [s, t] of segs) { if (b <= s || a >= t) { out.push([s, t]); continue; } if (a > s) out.push([s, a]); if (b < t) out.push([b, t]); } return out; }
+
+// ---------- 벽 ----------
+function wallPiece(room, e, s, t, yA, yB, slot, solid) {
+  if (t - s < 4 || yB - yA < 4) return;
+  let x1, x2, z1, z2;
+  if (e.line === 'h') { x1 = s; x2 = t; z1 = e.at; z2 = e.at + e.inward * HALF; }
+  else { z1 = s; z2 = t; x1 = e.at; x2 = e.at + e.inward * HALF; }
+  const inner = getMat(slot), pl = MAT.plaster();
+  const mats = [pl, pl, MAT.cap(), pl, pl, pl];
+  if (e.line === 'h') { mats[e.inward > 0 ? 4 : 5] = inner; mats[0] = mats[1] = inner; }
+  else { mats[e.inward > 0 ? 0 : 1] = inner; mats[4] = mats[5] = inner; }
+  box(vertical, x1, z1, x2, z2, yA, yB, mats, { slot, room: room.id });
+  qty.wall[slot] = (qty.wall[slot] || 0) + (t - s) / 1000 * (yB - yA) / 1000;
+  // 외벽 판정 → 바깥쪽 절반 추가
+  const mid = (s + t) / 2, probe = e.line === 'h' ? [mid, e.at - e.inward * 150] : [e.at - e.inward * 150, mid];
+  if (!roomAt(probe[0], probe[1])) {
+    const ex = MAT.ext(), m2 = [ex, ex, MAT.cap(), ex, ex, ex];
+    if (e.line === 'h') box(vertical, s, e.at, t, e.at - e.inward * (HALF + 40), yA, yB, m2, { nopick: true });
+    else box(vertical, e.at, s, e.at - e.inward * (HALF + 40), t, yA, yB, m2, { nopick: true });
+  }
+  // 걸레받이
+  if (solid && room.kind === 'dry' && yA <= 0) {
+    const bb = itemOf('baseboard');
+    const bm = bb.color === 'wall' ? getMat(slot) : bb.color === 'floor' ? getMat('floor_main') : fm('bb_' + bb.id, bb.color, bb.rough);
+    const pr = bb.inset ? 1 : 10, f = HALF;
+    if (e.line === 'h') box(vertical, s, e.at + e.inward * f, t, e.at + e.inward * (f + pr), 0, bb.h, bm, { slot: 'baseboard', cast: false });
+    else box(vertical, e.at + e.inward * f, s, e.at + e.inward * (f + pr), t, 0, bb.h, bm, { slot: 'baseboard', cast: false });
+    qty.base += (t - s) / 1000;
+  }
+}
+function buildWalls(room) {
+  const y0 = room.floorY || 0;
+  const edges = [
+    { name: 'top', line: 'h', at: room.z1, a: room.x1, b: room.x2, inward: 1 },
+    { name: 'bottom', line: 'h', at: room.z2, a: room.x1, b: room.x2, inward: -1 },
+    { name: 'left', line: 'v', at: room.x1, a: room.z1, b: room.z2, inward: 1 },
+    { name: 'right', line: 'v', at: room.x2, a: room.z1, b: room.z2, inward: -1 },
+  ];
+  for (const e of edges) {
+    const slot = room.feature && room.feature.edge === e.name ? room.feature.slot : room.wall;
+    const ops = OPEN.filter(o => o.line === e.line && Math.abs(o.at - e.at) < 3 && o.a < e.b && o.b > e.a);
+    let segs = [[e.a, e.b]];
+    for (const o of ops) segs = subtract(segs, o.a, o.b);
+    for (const [s, t] of segs) wallPiece(room, e, s, t, y0, H, slot, true);
+    for (const o of ops) {
+      const s = Math.max(o.a, e.a), t = Math.min(o.b, e.b);
+      if (o.type === 'open') continue;
+      if (['door', 'arch', 'entry', 'slide'].includes(o.type)) wallPiece(room, e, s, t, DOOR_H, H, slot);
+      else { if (o.sill > 0) wallPiece(room, e, s, t, y0, o.sill, slot); if (o.head < H) wallPiece(room, e, s, t, o.head, H, slot); }
+    }
+  }
+}
+
+// ---------- 개구부 (도어·창호) ----------
+function along(o, s, t, off1, off2, y1, y2, mat, parent = vertical, opt = {}) {
+  // o.line 방향으로 s..t, 선에서 off1..off2 (mm) 만큼 떨어진 박스
+  return o.line === 'h' ? box(parent, s, o.at + off1, t, o.at + off2, y1, y2, mat, opt) : box(parent, o.at + off1, s, o.at + off2, t, y1, y2, mat, opt);
+}
+function glassPanel(o, s, t, y1, y2, off, frameMat, glassMat, prof = 40, dep = 40, parent = vertical) {
+  along(o, s, s + prof, off - dep / 2, off + dep / 2, y1, y2, frameMat, parent, { slot: 'jungmun' });
+  along(o, t - prof, t, off - dep / 2, off + dep / 2, y1, y2, frameMat, parent, { slot: 'jungmun' });
+  along(o, s, t, off - dep / 2, off + dep / 2, y1, y1 + prof, frameMat, parent);
+  along(o, s, t, off - dep / 2, off + dep / 2, y2 - prof, y2, frameMat, parent);
+  const g = along(o, s + prof, t - prof, off - 4, off + 4, y1 + prof, y2 - prof, glassMat, parent, { nopick: true, cast: false });
+  g.castShadow = false;
+}
+function buildOpening(o) {
+  const dm = getMat('door');
+  if (o.type === 'door') {
+    const di = itemOf('door'), fw = 30;
+    qty.doors++;
+    along(o, o.a, o.a + fw, -HALF, HALF, 0, DOOR_H, dm, vertical, { slot: 'door' });
+    along(o, o.b - fw, o.b, -HALF, HALF, 0, DOOR_H, dm, vertical, { slot: 'door' });
+    along(o, o.a, o.b, -HALF, HALF, DOOR_H - fw, DOOR_H, dm, vertical, { slot: 'door' });
+    if (!di.hidden) for (const sg of [-1, 1]) {
+      const f1 = sg * HALF, f2 = sg * (HALF + 12);
+      along(o, o.a - 55, o.a, f1, f2, 0, DOOR_H + 55, dm, vertical, { slot: 'door' });
+      along(o, o.b, o.b + 55, f1, f2, 0, DOOR_H + 55, dm, vertical, { slot: 'door' });
+      along(o, o.a - 55, o.b + 55, f1, f2, DOOR_H, DOOR_H + 55, dm, vertical, { slot: 'door' });
+    }
+    // 문짝 (90° 개방)
+    const w = o.b - o.a - 2 * fw, hx = o.hinge === 'a' ? o.a + fw : o.b - fw, sd = o.hinge === 'a' ? 1 : -1;
+    const f0 = o.swing * HALF, f1 = o.swing * (HALF + w);
+    const leafX1 = hx, leafX2 = hx + sd * 38;
+    const hm = fm('handle_' + di.id, di.handle || '#888', .3, .9);
+    if (o.line === 'h') {
+      box(vertical, leafX1, o.at + f0, leafX2, o.at + f1, 5, DOOR_H - fw - 3, dm, { slot: 'door' });
+      box(vertical, leafX1 - sd * 25, o.at + o.swing * (HALF + w - 90), leafX2 + sd * 25, o.at + o.swing * (HALF + w - 70), 980, 1000, hm);
+    } else {
+      box(vertical, o.at + f0, leafX1, o.at + f1, leafX2, 5, DOOR_H - fw - 3, dm, { slot: 'door' });
+      box(vertical, o.at + o.swing * (HALF + w - 90), leafX1 - sd * 25, o.at + o.swing * (HALF + w - 70), leafX2 + sd * 25, 980, 1000, hm);
+    }
+  } else if (o.type === 'arch') {
+    along(o, o.a, o.a + 25, -HALF, HALF, 0, DOOR_H, dm, vertical, { slot: 'door' });
+    along(o, o.b - 25, o.b, -HALF, HALF, 0, DOOR_H, dm, vertical, { slot: 'door' });
+    along(o, o.a, o.b, -HALF, HALF, DOOR_H - 25, DOOR_H, dm, vertical, { slot: 'door' });
+  } else if (o.type === 'entry') {
+    const ed = MAT.entryDoor();
+    along(o, o.a, o.b, -HALF, HALF, -120, -60, ed);
+    along(o, o.a, o.a + 50, -HALF, HALF, -120, DOOR_H, ed); along(o, o.b - 50, o.b, -HALF, HALF, -120, DOOR_H, ed);
+    along(o, o.a, o.b, -HALF, HALF, DOOR_H - 50, DOOR_H, ed);
+    along(o, o.a + 50, o.b - 50, -25, 25, -60, DOOR_H - 50, ed);
+    along(o, o.a + 120, o.a + 160, -60, -25, 900, 1200, MAT.steel());
+  } else if (o.type === 'slide') {
+    const j = itemOf('jungmun');
+    if (!j.panels) return;
+    const frame = fm('jf_' + j.id, j.color, .45, .6);
+    const gl = fm('jg_' + j.id, j.glass, j.fluted ? .35 : .05, 0, { transparent: true, opacity: j.fluted ? .55 : .3, depthWrite: false });
+    along(o, o.a, o.b, -55, 55, DOOR_H - 40, DOOR_H, frame, vertical, { slot: 'jungmun' });
+    const W = o.b - o.a;
+    if (j.panels === 3) { const pw = W / 3 + 25; for (let i = 0; i < 3; i++) glassPanel(o, o.a + i * 70, o.a + i * 70 + pw, 0, DOOR_H - 40, -40 + i * 40, frame, gl, 25, 30); }
+    else if (j.panels === 1) { glassPanel(o, o.a + 20, o.a + 20 + W * .62, 0, DOOR_H - 40, 0, frame, gl, 35, 40); }
+    else {
+      glassPanel(o, o.b - 420, o.b, 0, DOOR_H - 40, 0, frame, gl, 45, 45);
+      const w = W - 440, leaf = { line: o.line === 'h' ? 'v' : 'h', at: o.a + 30 };
+      glassPanel(leaf, o.at + 30, o.at + 30 + w, 0, DOOR_H - 45, 0, frame, gl, 45, 45);
+    }
+  } else if (o.type === 'window' || o.type === 'slidewin') {
+    const sm = MAT.sash(), gm = MAT.glass();
+    const y1 = o.sill, y2 = o.head, p = 55, mid = (o.a + o.b) / 2;
+    along(o, o.a, o.a + p, -60, 60, y1, y2, sm, vertical, { nopick: true }); along(o, o.b - p, o.b, -60, 60, y1, y2, sm, vertical, { nopick: true });
+    along(o, o.a, o.b, -60, 60, y1, y1 + p, sm, vertical, { nopick: true }); along(o, o.a, o.b, -60, 60, y2 - p, y2, sm, vertical, { nopick: true });
+    along(o, mid - 30, mid + 30, -60, 60, y1, y2, sm, vertical, { nopick: true });
+    along(o, o.a + p, mid - 30, -24, -16, y1 + p, y2 - p, gm, vertical, { nopick: true, cast: false });
+    along(o, mid + 30, o.b - p, 16, 24, y1 + p, y2 - p, gm, vertical, { nopick: true, cast: false });
+  }
+}
+
+// ---------- 가구·붙박이 ----------
+function cabinetRun(o, s, t, f1, f2, y1, y2, mat, slot, door = 600) {
+  // o: {line, at} 기준선, s..t 길이 방향, f1..f2 깊이 방향(mm, 선 기준), 도어 분할 표현
+  along(o, s, t, f1 * .99, f2 * .99, y1, y2, mat, furn, { slot });
+  along(o, s, t, f1 + (f2 - f1) * .9, f2 - (f2 - f1) * .003, y1 + 1, y2 - 1, MAT.carcass(), furn, { slot });
+  const n = Math.max(1, Math.round((t - s) / door)), w = (t - s) / n, front = Math.abs(f2) > Math.abs(f1) ? f2 : f1, sg = Math.sign(front);
+  for (let i = 0; i < n; i++) along(o, s + i * w + 2, s + (i + 1) * w - 2, front - sg * 2, front + sg * 18, y1 + 2, y2 - 2, mat, furn, { slot });
+}
+function plant(x, z, s = 1) {
+  cyl(furn, x, z, 170 * s, 0, 380 * s, MAT.pot(), 20, { r2: 140 * s });
+  const g = new THREE.SphereGeometry(.32 * s, 14, 10); g.scale(1, 1.35, 1); g.translate(WX(x), (380 * s + 360 * s) / 1000, WZ(z));
+  const m = new THREE.Mesh(g, MAT.plant()); m.castShadow = true; furn.add(m);
+}
+function pendant(x, z, y = 1550) {
+  cyl(furn, x, z, 4, y, H, MAT.black(), 6);
+  const g = new THREE.SphereGeometry(.13, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2); g.rotateX(Math.PI); g.translate(WX(x), y / 1000 + .13, WZ(z));
+  const m = new THREE.Mesh(g, fm('shade', '#e8e2d6', .6, 0, { side: THREE.DoubleSide, emissive: '#ffd9a8', emissiveIntensity: 0 })); furn.add(m); ledMeshes.push(m);
+}
+function chair(x, z, rot) {
+  const c = new THREE.Group();
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(.44, .05, .44), MAT.oakF()); seat.position.y = .45;
+  const back = new THREE.Mesh(new THREE.BoxGeometry(.44, .36, .04), MAT.oakF()); back.position.set(0, .68, -.2);
+  c.add(seat, back);
+  for (const [lx, lz] of [[-.19, -.19], [.19, -.19], [-.19, .19], [.19, .19]]) { const l = new THREE.Mesh(new THREE.CylinderGeometry(.015, .015, .45), MAT.black()); l.position.set(lx, .225, lz); c.add(l); }
+  c.traverse(m => { m.castShadow = true; }); c.position.set(WX(x), 0, WZ(z)); c.rotation.y = rot; furn.add(c);
+}
+function buildFurniture() {
+  const kl = getMat('kitchen_lower'), ku = getMat('kitchen_upper'), ct = getMat('countertop'), bs = getMat('backsplash');
+  const cl = getMat('closet'), sh = getMat('shoe'), fx = getMat('bath_fixture');
+  // ── 거실
+  box(furn, 4190, 10350, 4640, 12750, 180, 470, MAT.walnutF(), {}); // 플로팅 TV장
+  box(furn, 4195, 10750, 4235, 12450, 950, 1900, MAT.tv());
+  box(furn, 5000, 10500, 8150, 13000, 0, 8, MAT.rug(), { cast: false });
+  box(furn, 7720, 10650, 8660, 13150, 0, 420, MAT.boucle()); // 소파
+  box(furn, 8430, 10650, 8660, 13150, 420, 800, MAT.boucle());
+  box(furn, 7720, 10650, 8660, 10850, 420, 620, MAT.boucle()); box(furn, 7720, 12950, 8660, 13150, 420, 620, MAT.boucle());
+  for (const z of [10900, 11650, 12400]) box(furn, 7760, z, 8420, z + 720, 420, 520, MAT.linen());
+  cyl(furn, 6500, 11900, 480, 0, 340, MAT.oakF(), 40);
+  plant(4500, 13250, 1.1);
+  // ── 주방 (ㄱ자: 북측벽 + 동측벽, 서측 키큰장)
+  const kTop = { line: 'h', at: 5085 }, kRight = { line: 'v', at: 8010 }, kLeft = { line: 'v', at: 4090 };
+  along(kTop, 5250, 7910, HALF, HALF + 580, 0, 100, MAT.carcass(), furn);
+  cabinetRun(kTop, 5250, 7910, HALF, HALF + 580, 100, 870, kl, 'kitchen_lower');
+  along(kTop, 5250, 7910, HALF, HALF + 620, 870, 900, ct, furn, { slot: 'countertop' });
+  const kR = { line: 'v', at: 8010 };
+  along(kR, 5785, 7100, -HALF, -HALF - 580, 0, 100, MAT.carcass(), furn);
+  cabinetRun(kR, 5805, 7100, -HALF, -HALF - 580, 100, 870, kl, 'kitchen_lower');
+  along(kR, 5785, 7100, -HALF, -HALF - 620, 870, 900, ct, furn, { slot: 'countertop' });
+  box(furn, 7370, 6150, 7850, 6750, 900, 905, MAT.tv()); // 인덕션
+  box(furn, 6150, 5330, 6950, 5730, 860, 901, MAT.steel()); // 싱크
+  cyl(furn, 6550, 5260, 14, 900, 1250, MAT.steel(), 10);
+  // 백스플래시
+  along(kR, 5185, 7100, -HALF, -HALF - 8, 900, 1450, bs, furn, { slot: 'backsplash' });
+  along(kTop, 7400, 7910, HALF, HALF + 8, 900, 1450, bs, furn, { slot: 'backsplash' });
+  along(kTop, 5250, 7400, HALF, HALF + 8, 900, 1000, bs, furn, { slot: 'backsplash' });
+  qty.wall.backsplash = (1.915 * .55 + .51 * .55 + 2.15 * .1);
+  // 상부장 (동측벽)
+  cabinetRun(kR, 5185, 7100, -HALF, -HALF - 350, 1450, 2280, ku, 'kitchen_upper', 480);
+  along(kR, 5185, 7100, -HALF - 300, -HALF - 340, 1440, 1450, MAT.led(), uppers).userData.led = true;
+  // 키큰장 (냉장고장, 서측벽)
+  cabinetRun(kLeft, 5950, 7650, HALF, HALF + 650, 0, 2280, ku, 'kitchen_upper', 850);
+  // 식탁
+  box(furn, 5300, 7250, 6900, 8150, 720, 750, MAT.oakF());
+  for (const x of [5450, 6750]) box(furn, x - 30, 7650, x + 30, 7750, 0, 720, MAT.black());
+  for (const x of [5700, 6500]) { chair(x, 6950, 0); chair(x, 8450, Math.PI); }
+  pendant(5750, 7700); pendant(6450, 7700);
+  qty.klower = (7910 - 5250 + 7100 - 5785) / 1000; qty.kupper = (7100 - 5185 + 7650 - 5950) / 1000; qty.ctop = qty.klower;
+  // ── 현관 신발장
+  const eL = { line: 'v', at: 8010 };
+  cabinetRun(eL, 4900, 7100, HALF, HALF + 400, 150, 1000, sh, 'shoe', 450);
+  cabinetRun(eL, 4900, 7100, HALF, HALF + 400, 1380, 2280, sh, 'shoe', 450);
+  along(eL, 4900, 7100, HALF, HALF + 400, 1000, 1010, sh, furn, { slot: 'shoe' });
+  along(eL, 4900, 7100, HALF + 20, HALF + 380, 1370, 1380, MAT.led(), furn).userData.led = true;
+  qty.shoe = 2.2;
+  // ── 안방
+  box(furn, 180, 10900, 2280, 12500, 0, 300, MAT.oakF());
+  box(furn, 200, 10920, 2260, 12480, 300, 540, MAT.linen());
+  box(furn, 1500, 10900, 2290, 12500, 520, 570, MAT.fabric2());
+  box(furn, 100, 10800, 180, 12600, 0, 1150, MAT.boucle());
+  for (const z of [11150, 11850]) box(furn, 220, z, 620, z + 520, 540, 680, MAT.linen());
+  for (const z of [10300, 12650]) { box(furn, 120, z, 560, z + 420, 0, 480, MAT.oakF()); cyl(furn, 340, z + 210, 110, 480, 520, MAT.ceramic(), 16); }
+  box(furn, 120, 10800, 160, 12600, 1150, 1165, MAT.led(), furn).userData.led = true;
+  const mR = { line: 'v', at: 4090 };
+  cabinetRun(mR, 10700, 13350, -HALF, -HALF - 600, 0, 2280, cl, 'closet', 500);
+  qty.closet = 2.65;
+  // ── 드레스룸
+  if (state.dress) {
+    const dR = { line: 'v', at: 2600 }, dT = { line: 'h', at: 7755 };
+    cabinetRun(dR, 7855, 9590, -HALF, -HALF - 600, 0, 2280, cl, 'closet', 450);
+    cabinetRun(dT, 1350, 1900, HALF, HALF + 600, 0, 2280, cl, 'closet', 550);
+    qty.closet += 1.735 + .55;
+  }
+  // ── 침실2
+  const b2T = { line: 'h', at: 10280 };
+  cabinetRun(b2T, 9800, 11870, HALF, HALF + 600, 0, 2280, cl, 'closet', 520);
+  qty.closet += 2.07;
+  box(furn, 9850, 11500, 11790, 12650, 0, 280, MAT.oakF());
+  box(furn, 9870, 11520, 11780, 12630, 280, 500, MAT.linen());
+  box(furn, 9850, 11520, 10600, 12630, 480, 520, fm('throw2', '#9fb0bf', 1));
+  box(furn, 11790, 11450, 11870, 12700, 0, 950, MAT.oakF());
+  box(furn, 8880, 12300, 9480, 13300, 720, 750, MAT.oakF()); chair(9500, 12800, -Math.PI / 2);
+  // ── 침실3 (서재)
+  box(furn, 1845, 5600, 2445, 7200, 720, 750, MAT.oakF());
+  box(furn, 1845, 5600, 1885, 7200, 0, 720, MAT.oakF()); box(furn, 2405, 5600, 2445, 7200, 0, 720, MAT.oakF());
+  box(furn, 1845, 5700, 2145, 7100, 1400, 1420, MAT.oakF()); box(furn, 1845, 5700, 2145, 7100, 1800, 1820, MAT.oakF());
+  chair(2700, 6400, -Math.PI / 2);
+  box(furn, 3300, 5300, 3990, 6700, 0, 380, MAT.boucle()); box(furn, 3800, 5300, 3990, 6700, 380, 750, MAT.boucle());
+  // ── 복도 수납
+  const hC = { line: 'h', at: 9620 };
+  cabinetRun(hC, 10000, 11870, HALF, HALF + 400, 0, 2280, cl, 'closet', 470);
+  qty.closet += 1.87;
+  // ── 욕실1 (샤워부스)
+  const gl = MAT.glass(), fxm = fx;
+  box(furn, 100, 6250, 900, 6260, 0, 2000, gl, { nopick: true, cast: false });
+  box(furn, 895, 6250, 905, 6260, 0, 2000, fxm, { slot: 'bath_fixture' });
+  box(furn, 100, 5185, 1645, 6250, 0, 30, getMat('bath_floor'), { slot: 'bath_floor', cast: false });
+  cyl(furn, 400, 5400, 110, 2050, 2065, fxm, 24, { slot: 'bath_fixture' });
+  box(furn, 120, 5380, 180, 5420, 1150, 2060, fxm, { slot: 'bath_fixture' });
+  box(furn, 100, 5700, 160, 6100, 1100, 1400, MAT.led()).userData.led = true; // 니치 조명
+  box(furn, 100, 6450, 650, 6850, 350, 750, MAT.ceramic(), { slot: 'bath_fixture' }); // 벽걸이 변기
+  box(furn, 100, 6420, 160, 6880, 750, 1100, MAT.ceramic());
+  box(furn, 1145, 6250, 1645, 6950, 450, 850, MAT.oakF());
+  box(furn, 1145, 6250, 1645, 6950, 850, 870, MAT.ceramic());
+  box(furn, 1630, 6300, 1645, 6900, 1050, 1850, fm('mirror', '#dfe6e8', .02, 1));
+  box(furn, 1600, 6580, 1645, 6620, 900, 1050, fxm, { slot: 'bath_fixture' });
+  // ── 욕실2 (욕조)
+  box(furn, 11120, 7325, 11870, 9025, 0, 560, MAT.ceramic());
+  box(furn, 11190, 7395, 11800, 8955, 380, 561, fm('water', '#d7e3e6', .05, 0));
+  box(furn, 11850, 7600, 11870, 8800, 1100, 1350, MAT.led()).userData.led = true;
+  box(furn, 11850, 8110, 11870, 8130, 900, 1900, fxm, { slot: 'bath_fixture' });
+  box(furn, 11800, 8080, 11870, 8160, 1880, 1900, fxm, { slot: 'bath_fixture' });
+  box(furn, 10100, 8920, 10500, 9520, 350, 750, MAT.ceramic(), { slot: 'bath_fixture' });
+  box(furn, 10080, 9460, 10520, 9520, 750, 1100, MAT.ceramic());
+  box(furn, 10000, 7325, 10900, 7805, 450, 850, MAT.oakF());
+  box(furn, 10000, 7325, 10900, 7805, 850, 870, MAT.ceramic());
+  box(furn, 10050, 7325, 10850, 7340, 1050, 1850, fm('mirror', '#dfe6e8', .02, 1));
+  qty.baths = 2;
+  // ── 발코니·다용도실
+  box(furn, 7150, 3285, 7850, 3985, 0, 850, MAT.appliance()); box(furn, 7150, 3285, 7850, 3985, 860, 1700, MAT.appliance());
+  box(furn, 7300, 3985, 7700, 3995, 250, 650, MAT.tv()); box(furn, 7300, 3985, 7700, 3995, 1100, 1500, MAT.tv());
+  box(furn, 4190, 3285, 4790, 3785, 0, 850, MAT.ceramic());
+  plant(1000, 14600, .9); plant(11500, 14350, .8);
+  if (!state.expand) { box(furn, 7400, 14100, 8000, 14700, 0, 420, MAT.oakF()); plant(5000, 14500, 1); }
+  else { box(furn, 4700, 13900, 6300, 14800, 0, 380, MAT.boucle()); plant(8300, 14650, 1); }
+}
+
+// ---------- 천장·조명 ----------
+function buildCeilingAndLights() {
+  for (const r of ROOMS) {
+    const c = box(ceilGroup, r.x1, r.z1, r.x2, r.z2, H, H + 20, MAT.ceiling(), { cast: false, nopick: true });
+    c.castShadow = false;
+    qty.ceiling += (r.x2 - r.x1) * (r.z2 - r.z1) / 1e6;
+    // 다운라이트
+    const n = r.lights || 1, cols = Math.ceil(Math.sqrt(n)), rows = Math.ceil(n / cols);
+    for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) {
+      if (i * rows + j >= n) continue;
+      const x = r.x1 + (r.x2 - r.x1) * (i + .5) / cols, z = r.z1 + (r.z2 - r.z1) * (j + .5) / rows;
+      const d = cyl(ceilGroup, x, z, 45, H - 4, H, MAT.led(), 16); d.castShadow = false; d.userData.led = true; d.userData.nopick = true;
+    }
+    if (r.kind === 'bal') continue;
+    const pl = new THREE.PointLight('#ffd9a8', 0, 9, 1.6);
+    pl.position.set(WX((r.x1 + r.x2) / 2), 1.75, WZ((r.z1 + r.z2) / 2));
+    pl.userData.power = (r.x2 - r.x1) * (r.z2 - r.z1) / 1e6;
+    root.add(pl); roomLights.push(pl);
+  }
+  // 거실 우물천장 간접조명 + 복도 라인조명
+  if (state.cove) {
+    const lv = ROOMS.find(r => r.id === 'living'), i = 350;
+    const s = [[lv.x1 + i, lv.z1 + i, lv.x2 - i, lv.z1 + i + 25], [lv.x1 + i, lv.z2 - i - 25, lv.x2 - i, lv.z2 - i], [lv.x1 + i, lv.z1 + i, lv.x1 + i + 25, lv.z2 - i], [lv.x2 - i - 25, lv.z1 + i, lv.x2 - i, lv.z2 - i]];
+    for (const [a, b, c, d] of s) { const m = box(ceilGroup, a, b, c, d, H - 12, H, MAT.led(), { cast: false, nopick: true }); m.userData.led = true; }
+    for (const [a, b, c, d] of [[8835, 7300, 8865, 10200], [9700, 9935, 11800, 9965], [3330, 7800, 3360, 9600]]) { const m = box(ceilGroup, a, b, c, d, H - 8, H, MAT.led(), { cast: false, nopick: true }); m.userData.led = true; }
+  }
+}
+
+// ---------- 빌드 ----------
+function disposeGroup(g) { g.traverse(o => { if (o.geometry) o.geometry.dispose(); }); }
+function build() {
+  if (root) { scene.remove(root); disposeGroup(root); }
+  root = new THREE.Group(); vertical = new THREE.Group(); ceilGroup = new THREE.Group(); uppers = new THREE.Group(); furn = new THREE.Group();
+  root.add(vertical, ceilGroup, uppers, furn); scene.add(root);
+  ledMeshes = []; roomLights = [];
+  qty = { floor: {}, wall: {}, base: 0, doors: 0, ceiling: 0, klower: 0, kupper: 0, ctop: 0, closet: 0, shoe: 0, baths: 0 };
+  ROOMS = getRooms(state); OPEN = getOpenings(state);
+  for (const r of ROOMS) {
+    const y0 = r.floorY || 0;
+    box(root, r.x1, r.z1, r.x2, r.z2, -200, y0, getMat(r.floor), { slot: r.floor, room: r.id, cast: false });
+    qty.floor[r.floor] = (qty.floor[r.floor] || 0) + (r.x2 - r.x1) * (r.z2 - r.z1) / 1e6;
+    buildWalls(r);
+  }
+  // 슬래브 바닥 (외곽 그림자 받이)
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.ShadowMaterial({ opacity: .12 }));
+  ground.rotation.x = -Math.PI / 2; ground.position.y = -.201; ground.receiveShadow = true; ground.userData.nopick = true; root.add(ground);
+  for (const o of OPEN) buildOpening(o);
+  buildFurniture();
+  buildCeilingAndLights();
+  root.traverse(o => { if (o.material && o.material === FM.led) ledMeshes.push(o); });
+  buildLabels();
+  applyView(); applyLighting();
+}
+
+// ---------- 조명 모드 ----------
+function applyLighting() {
+  const k = kelvinRGB(state.kelvin), mode = state.light;
+  const day = mode === 'day', eve = mode === 'evening';
+  sun.intensity = day ? 2.6 : eve ? .9 : 0;
+  sun.color.set(day ? '#fff4e5' : '#ffb27a');
+  sun.position.set(day ? 5 : -9, day ? 14 : 4.5, 11);
+  hemi.intensity = day ? .85 : eve ? .3 : .1;
+  scene.environmentIntensity = day ? .55 : eve ? .22 : .1;
+  scene.background = new THREE.Color(day ? '#e8e5df' : eve ? '#3a3940' : '#14161b');
+  renderer.toneMappingExposure = day ? 1 : .95;
+  for (const l of roomLights) { l.color.copy(k); l.intensity = day ? 0 : (eve ? 3.2 : 4) * Math.min(3, .8 + l.userData.power / 7); }
+  const led = MAT.led(); led.emissive.copy(k); led.emissiveIntensity = day ? .05 : 3;
+  if (FM.shade) { FM.shade.emissive.copy(k); FM.shade.emissiveIntensity = day ? 0 : .9; }
+}
+
+// ---------- 뷰 (조감·평면·워크스루) ----------
+const walk = { yaw: 0, pitch: 0, pos: new THREE.Vector3(), keys: {}, drag: null };
+const SPOTS = {
+  living: [7900, 9300, 4500, 12300], kitchen: [6400, 9900, 6400, 5085], entry: [8850, 8500, 8850, 4800], master: [3000, 10250, 300, 12900],
+  dress: [600, 9500, 2200, 7900], bed2: [9250, 10650, 11600, 13200], bed3: [3700, 7400, 1900, 5300], mbath: [850, 7600, 900, 5200],
+  cbath: [9950, 9350, 11600, 7500], lbal: [5000, 13700, 8500, 14900], utility: [4600, 4900, 7600, 3300], hallC: [9200, 9950, 11800, 9950],
+};
+function applyView() {
+  const w = state.view === 'walk', top = state.view === 'top';
+  ceilGroup.visible = w || state.ceiling;
+  const cut = !w && state.cutaway;
+  vertical.scale.y = cut ? .42 : 1; uppers.visible = !cut;
+  controls.enabled = !w;
+  document.body.classList.toggle('walking', w);
+  if (w) { camera.fov = 68; camera.updateProjectionMatrix(); }
+  if (top) { camera.fov = 40; camera.updateProjectionMatrix(); camera.position.set(0, 27, .01); controls.target.set(0, 0, 0); controls.update(); }
+}
+function setView(v, roomId) {
+  state.view = v;
+  if (v === 'orbit') setOrbitHome();
+  if (v === 'walk') goSpot(roomId || 'living');
+  applyView(); updateLabels();
+  if (window.onViewChange) window.onViewChange();
+}
+function goSpot(id) {
+  const s = SPOTS[id] || (() => { const r = ROOMS.find(r => r.id === id); return [(r.x1 + r.x2) / 2, (r.z1 + r.z2) / 2 + 300, (r.x1 + r.x2) / 2, r.z1]; })();
+  walk.pos.set(WX(s[0]), 1.55, WZ(s[1]));
+  const dx = WX(s[2]) - walk.pos.x, dz = WZ(s[3]) - walk.pos.z;
+  walk.yaw = Math.atan2(-dx, -dz); walk.pitch = -.08;
+  const sel = document.getElementById('roomSel'); if (sel && SPOTS[id]) sel.value = id;
+}
+function canWalk(x, z) {
+  const xm = x * 1000 + CX, zm = z * 1000 + CZ, m = 230;
+  if (ROOMS.some(r => xm > r.x1 + m && xm < r.x2 - m && zm > r.z1 + m && zm < r.z2 - m)) return true;
+  return OPEN.some(o => {
+    if (!['open', 'door', 'arch', 'slide'].includes(o.type) && !(o.type === 'slidewin')) return false;
+    const [u, v] = o.line === 'h' ? [xm, zm] : [zm, xm];
+    return u > o.a + 120 && u < o.b - 120 && Math.abs(v - o.at) < 420;
+  });
+}
+function focusRoom(id) {
+  const r = ROOMS.find(r => r.id === id); if (!r || state.view !== 'orbit') return;
+  const t = new THREE.Vector3(WX((r.x1 + r.x2) / 2), 0, WZ((r.z1 + r.z2) / 2));
+  tween = { from: controls.target.clone(), to: t, fromP: camera.position.clone(), toP: t.clone().add(new THREE.Vector3(3.6, 7.2, 6.4)), t: 0 };
+}
+let tween = null;
+
+// ---------- 라벨 ----------
+const labelLayer = document.getElementById('labels');
+let labels = [];
+function buildLabels() {
+  labelLayer.innerHTML = ''; labels = [];
+  for (const r of ROOMS) {
+    if (r.nolabel) continue;
+    const a = (r.x2 - r.x1) * (r.z2 - r.z1) / 1e6;
+    const d = document.createElement('div'); d.className = 'rlabel';
+    d.innerHTML = `<b>${r.name}</b><span>${a.toFixed(1)}㎡ · ${(a / 3.3058).toFixed(1)}평</span>`;
+    d.onclick = () => { focusRoom(r.id); window.onRoomPick && window.onRoomPick(r.id); };
+    labelLayer.appendChild(d);
+    labels.push({ el: d, p: new THREE.Vector3(WX((r.x1 + r.x2) / 2), .05, WZ((r.z1 + r.z2) / 2)) });
+  }
+  updateLabels();
+}
+const _v = new THREE.Vector3();
+function updateLabels() {
+  const show = state.view !== 'walk' && !state.hideLabels, w = viewport.clientWidth, h = viewport.clientHeight;
+  labelLayer.style.display = show ? '' : 'none'; if (!show) return;
+  for (const l of labels) {
+    _v.copy(l.p).project(camera);
+    l.el.style.transform = `translate(-50%,-50%) translate(${(_v.x * .5 + .5) * w}px,${(-_v.y * .5 + .5) * h}px)`;
+    l.el.style.opacity = _v.z < 1 ? 1 : 0;
+  }
+}
+
+// ---------- 피킹 ----------
+const ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
+let downAt = null;
+renderer.domElement.addEventListener('pointerdown', e => {
+  downAt = [e.clientX, e.clientY];
+  if (state.view === 'walk') { walk.drag = [e.clientX, e.clientY]; renderer.domElement.setPointerCapture(e.pointerId); }
+});
+renderer.domElement.addEventListener('pointermove', e => {
+  if (state.view === 'walk' && walk.drag) {
+    walk.yaw -= (e.clientX - walk.drag[0]) * .005; walk.pitch = Math.max(-1.2, Math.min(1.2, walk.pitch - (e.clientY - walk.drag[1]) * .004));
+    walk.drag = [e.clientX, e.clientY];
+  }
+});
+renderer.domElement.addEventListener('pointerup', e => {
+  walk.drag = null;
+  if (!downAt || Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 6) return;
+  const rc = renderer.domElement.getBoundingClientRect();
+  ptr.set((e.clientX - rc.left) / rc.width * 2 - 1, -(e.clientY - rc.top) / rc.height * 2 + 1);
+  ray.setFromCamera(ptr, camera);
+  const hits = ray.intersectObject(root, true).filter(h => { if (h.object.userData.nopick) return false; let o = h.object; while (o) { if (!o.visible) return false; o = o.parent; } return true; });
+  const hit = hits.find(h => h.object.userData.slot);
+  if (hit && window.onSlotPick) window.onSlotPick(hit.object.userData.slot, hit.object.userData.room);
+});
+window.addEventListener('keydown', e => { if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return; walk.keys[e.key.toLowerCase()] = true; });
+window.addEventListener('keyup', e => { walk.keys[e.key.toLowerCase()] = false; });
+
+// 선택 하이라이트
+let flash = null;
+function flashSlot(slot) {
+  const m = slotMat[slot]; if (!m) return;
+  if (flash && flash.m !== m) { flash.m.emissive.set('#000'); }
+  flash = { m, t: 0 };
+}
+
+// ---------- 루프 ----------
+function resize() {
+  const w = viewport.clientWidth, h = viewport.clientHeight;
+  renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+let homed = false;
+new ResizeObserver(() => { resize(); if (!homed && viewport.clientWidth) { homed = true; setOrbitHome(); } }).observe(viewport);
+let last = performance.now();
+function loop(now) {
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  if (state.view === 'walk') {
+    const k = walk.keys, sp = (k.shift ? 2.6 : 1.5) * dt;
+    let f = (k.w || k.arrowup ? 1 : 0) - (k.s || k.arrowdown ? 1 : 0), st = (k.d ? 1 : 0) - (k.a ? 1 : 0);
+    if (k.arrowleft || k.q) walk.yaw += 1.8 * dt; if (k.arrowright || k.e) walk.yaw -= 1.8 * dt;
+    const fx = -Math.sin(walk.yaw), fz = -Math.cos(walk.yaw);
+    const dx = (fx * f - fz * st) * sp, dz = (fz * f + fx * st) * sp;
+    if (canWalk(walk.pos.x + dx, walk.pos.z)) walk.pos.x += dx;
+    if (canWalk(walk.pos.x, walk.pos.z + dz)) walk.pos.z += dz;
+    camera.position.copy(walk.pos); camera.rotation.set(walk.pitch, walk.yaw, 0, 'YXZ');
+  } else {
+    if (tween) {
+      tween.t = Math.min(1, tween.t + dt * 1.8); const e = 1 - Math.pow(1 - tween.t, 3);
+      controls.target.lerpVectors(tween.from, tween.to, e); camera.position.lerpVectors(tween.fromP, tween.toP, e);
+      if (tween.t >= 1) tween = null;
+    }
+    controls.update();
+  }
+  if (flash) { flash.t += dt; const a = Math.max(0, Math.sin(flash.t * 9) * (1 - flash.t / 1.4)); flash.m.emissive.setRGB(a * .25, a * .45, a * .7); if (flash.t > 1.4) { flash.m.emissive.set('#000'); flash = null; } }
+  renderer.render(scene, camera);
+  updateLabels();
+  requestAnimationFrame(loop);
+}
+
+function snapshot() { renderer.render(scene, camera); return renderer.domElement.toDataURL('image/jpeg', .92); }
+
+// ============================================================
+//  UI : 컨셉 · 마감재 · 견적 · 기획서 패널
+// ============================================================
+
+const $ = s => document.querySelector(s);
+const won = n => Math.round(n).toLocaleString('ko-KR');
+const man = n => (n / 10000).toLocaleString('ko-KR', { maximumFractionDigits: 0 }) + '만';
+let tab = 'concept', zone = '공용부';
+
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('on'), 1800); }
+
+// ---------- 스와치 ----------
+const swCache = {};
+function swatch(item, slot) {
+  const key = item.id;
+  if (swCache[key]) return swCache[key];
+  const it = item.color === 'ctop' ? itemOf('countertop') : item;
+  const c = document.createElement('canvas'); c.width = c.height = 96; const ctx = c.getContext('2d');
+  const t = it.tex && it.tex.k !== 'paint' ? texFor(it) : null;
+  if (t) { const s = t.canvas; const cw = Math.min(s.width, s.height) * .55; ctx.drawImage(s, 0, 0, cw, cw, 0, 0, 96, 96); }
+  else if (it.color === 'wall' || it.color === 'floor') { ctx.fillStyle = '#ddd'; ctx.fillRect(0, 0, 96, 96); ctx.fillStyle = '#999'; ctx.font = '600 20px sans-serif'; ctx.fillText(it.color === 'wall' ? '벽색' : '마루색', 18, 56); }
+  else {
+    ctx.fillStyle = it.color; ctx.fillRect(0, 0, 96, 96);
+    if (it.glass) { ctx.fillStyle = it.glass; ctx.globalAlpha = .7; ctx.fillRect(16, 10, 64, 76); ctx.globalAlpha = 1; }
+    if (it.metal) { const g = ctx.createLinearGradient(0, 0, 96, 96); g.addColorStop(0, 'rgba(255,255,255,.45)'); g.addColorStop(.5, 'rgba(255,255,255,0)'); g.addColorStop(1, 'rgba(0,0,0,.25)'); ctx.fillStyle = g; ctx.fillRect(0, 0, 96, 96); }
+  }
+  return (swCache[key] = c.toDataURL('image/jpeg', .85));
+}
+
+// ---------- 견적 ----------
+const CAT_OF = { floor_main: '바닥', floor_entry: '타일', floor_balcony: '타일', wall_living: '도배·도장', wall_kitchen: '도배·도장', wall_master: '도배·도장', wall_bed2: '도배·도장', wall_bed3: '도배·도장', wall_balcony: '도배·도장', wall_feature: '아트월', baseboard: '목공', door: '도어·중문', jungmun: '도어·중문', kitchen_lower: '주방', kitchen_upper: '주방', countertop: '주방', backsplash: '주방', shoe: '가구', closet: '가구', bath_wall: '욕실', bath_floor: '욕실', bath_fixture: '욕실' };
+function qtyOf(slot) {
+  const c = CATALOG[slot];
+  switch (c.qty) {
+    case 'floor': return (qty.floor[slot] || 0) * .92;
+    case 'wall': return qty.wall[slot] || 0;
+    case 'base': return qty.base; case 'doors': return qty.doors; case 'one': return 1; case 'baths': return qty.baths;
+    default: return qty[c.qty] || 0;
+  }
+}
+function estimate() {
+  const lines = [];
+  for (const slot in CATALOG) {
+    const it = itemOf(slot), q = qtyOf(slot);
+    if (!q) continue;
+    lines.push({ cat: CAT_OF[slot] || '기타', name: CATALOG[slot].label, item: it.name, q, unit: CATALOG[slot].unit, price: it.price, amt: q * it.price, slot });
+  }
+  for (const f of FIXED_COSTS) {
+    let amt = f.amt, q = 1, unit = '식', price = f.amt;
+    if (f.perM2) { q = qty.ceiling * .92; unit = '㎡'; price = f.perM2; amt = q * price; }
+    if (f.perBath) { q = qty.baths; unit = '개소'; price = f.perBath; amt = q * price; }
+    lines.push({ cat: '공통', name: f.name, item: f.note, q, unit, price, amt });
+  }
+  for (const k of ['sash', 'expand', 'dress', 'cove']) if (state[k]) { const o = OPTION_COSTS[k]; lines.push({ cat: '옵션', name: o.name, item: o.note, q: 1, unit: '식', price: o.amt, amt: o.amt }); }
+  const sub = lines.reduce((s, l) => s + l.amt, 0), mg = sub * MGMT_RATE, vat = state.vat ? (sub + mg) * .1 : 0;
+  return { lines, sub, mg, vat, total: sub + mg + vat };
+}
+
+// ---------- 탭 렌더 ----------
+function renderConcept() {
+  const cards = CONCEPTS.map(c => {
+    const chips = ['floor_main', 'wall_living', 'wall_feature', 'kitchen_lower', 'countertop', 'closet'].map(s => { const it = CATALOG[s].items.find(i => i.id === c.pick[s]); return `<i style="background:${it.color === 'ctop' ? '#ddd' : it.color}" title="${it.name}"></i>`; }).join('');
+    return `<div class="concept ${state.concept === c.id ? 'on' : ''}" data-c="${c.id}">
+      <div class="chips">${chips}</div>
+      <h3>${c.name}<small>${c.en}</small></h3><p>${c.desc}</p>
+      <div class="keys">${c.keys.map(k => `<span>${k}</span>`).join('')}</div></div>`;
+  }).join('');
+  const tg = (k, label, sub) => `<label class="tg"><input type="checkbox" data-k="${k}" ${state[k] ? 'checked' : ''}><span></span><div>${label}<small>${sub}</small></div></label>`;
+  $('#pane').innerHTML = `
+    <section><h2>디자인 컨셉 <em>2026</em></h2><div class="concepts">${cards}</div></section>
+    <section><h2>공간 구성 옵션</h2>
+      ${tg('dress', '안방 드레스룸 구획 (제안안)', '전실 1.9m를 드레스룸으로 바꾸고 욕실1을 안방 전용으로')}
+      ${tg('expand', '거실 발코니 확장', '거실 깊이 +1.5m · 관리주체 행위허가 필요')}
+      ${tg('sash', '샷시 전체 교체 견적 포함', '구축 단열·결로 개선의 핵심 공정')}
+      ${tg('cove', '간접조명 패키지', '거실 우물천장 · 복도 라인조명 · 니치 LED')}
+    </section>
+    <section><h2>조명 시뮬레이션</h2>
+      <div class="seg" id="lightSeg">${[['day', '☀ 주간'], ['evening', '◐ 저녁'], ['night', '☾ 야간']].map(([k, l]) => `<button data-l="${k}" class="${state.light === k ? 'on' : ''}">${l}</button>`).join('')}</div>
+      <div class="kel"><span>색온도</span><input type="range" id="kel" min="2700" max="5000" step="100" value="${state.kelvin}"><b id="kelv">${state.kelvin}K</b></div>
+      <p class="hint">저녁·야간 모드에서 실내 조명이 켜집니다. 천장이 있는 1인칭 워크스루에서 보면 분위기를 확인하기 좋아요.</p>
+    </section>
+    <section><h2>보기 옵션</h2>
+      ${tg('ceiling', '천장 표시', '조감도에서 천장·다운라이트 표시')}
+      ${tg('cutaway', '벽 낮춰 보기 (단면)', '벽을 낮춰 가구 배치를 한눈에')}
+    </section>`;
+  $('#pane').querySelectorAll('.concept').forEach(el => el.onclick = () => applyConcept(el.dataset.c));
+  $('#pane').querySelectorAll('.tg input').forEach(el => el.onchange = () => {
+    state[el.dataset.k] = el.checked;
+    if (['dress', 'expand', 'cove'].includes(el.dataset.k)) { build(); }
+    else applyView();
+    saveState(); updateTotal();
+  });
+  $('#pane').querySelectorAll('#lightSeg button').forEach(b => b.onclick = () => { state.light = b.dataset.l; applyLighting(); saveState(); renderConcept(); });
+  $('#kel').oninput = e => { state.kelvin = +e.target.value; $('#kelv').textContent = state.kelvin + 'K'; applyLighting(); saveState(); };
+}
+function applyConcept(id) {
+  const c = CONCEPTS.find(c => c.id === id);
+  state.concept = id; state.sel = { ...c.pick }; state.kelvin = c.light.k;
+  applyAll(); build(); saveState(); render(); updateTotal();
+  toast(`'${c.name}' 컨셉을 적용했어요`);
+}
+
+function renderFinish(focusSlot) {
+  const zs = ['전체', ...ZONES];
+  const slots = Object.keys(CATALOG).filter(s => zone === '전체' || CATALOG[s].zone === zone);
+  $('#pane').innerHTML = `<div class="zones">${zs.map(z => `<button data-z="${z}" class="${zone === z ? 'on' : ''}">${z}</button>`).join('')}</div>
+    <p class="hint">3D 화면에서 벽·바닥·가구를 탭하면 해당 항목으로 바로 이동합니다.</p>` +
+    slots.map(slot => {
+      const c = CATALOG[slot], cur = itemOf(slot), q = qtyOf(slot);
+      return `<section class="slot" id="slot-${slot}"><div class="sh"><h3>${c.label}</h3><span>${c.where}</span></div>
+        <div class="qty">물량 ${q.toFixed(c.unit === '㎡' || c.unit === 'm' ? 1 : 0)}${c.unit} · 소계 <b>${won(q * cur.price)}원</b></div>
+        <div class="items">${c.items.map(it => `<button class="item ${it.id === cur.id ? 'on' : ''}" data-s="${slot}" data-i="${it.id}">
+          <img src="${swatch(it, slot)}" alt=""><div><b>${it.name}</b><small>${it.spec}</small>
+          <span class="pr">${it.price ? won(it.price) + '원/' + c.unit : '—'}</span>${it.tag ? `<em>${it.tag}</em>` : ''}</div></button>`).join('')}</div></section>`;
+    }).join('');
+  $('#pane').querySelectorAll('.zones button').forEach(b => b.onclick = () => { zone = b.dataset.z; renderFinish(); });
+  $('#pane').querySelectorAll('.item').forEach(b => b.onclick = () => pickItem(b.dataset.s, b.dataset.i));
+  if (focusSlot) { const el = document.getElementById('slot-' + focusSlot); if (el) { el.scrollIntoView({ block: 'start', behavior: 'smooth' }); el.classList.add('pulse'); setTimeout(() => el.classList.remove('pulse'), 1400); } }
+}
+function pickItem(slot, id) {
+  state.sel[slot] = id; state.concept = 'custom';
+  if (['baseboard', 'door', 'jungmun'].includes(slot)) build();
+  applySlot(slot);
+  if (slot === 'countertop') applySlot('backsplash');
+  flashSlot(slot); saveState();
+  const y = $('#pane').scrollTop; renderFinish(); $('#pane').scrollTop = y; updateTotal();
+}
+
+function renderEstimate() {
+  const e = estimate(), py = PLAN_META.pyeong;
+  const cats = {}; for (const l of e.lines) (cats[l.cat] = cats[l.cat] || []).push(l);
+  const order = ['공통', '옵션', '바닥', '도배·도장', '아트월', '목공', '도어·중문', '주방', '가구', '욕실', '타일'];
+  const lo = 6100e4, hi = 8500e4, mx = Math.max(e.total, 1e8) * 1.1;
+  $('#pane').innerHTML = `<section class="sum">
+      <div class="big"><small>예상 총 공사비 (부가세 ${state.vat ? '포함' : '별도'})</small><b>${man(e.total)}원</b><span>평당 ${man(e.total / py)}원 · ${py}평 기준</span></div>
+      <div class="range"><div class="bar"><i class="mk" style="left:${lo / mx * 100}%;width:${(hi - lo) / mx * 100}%"></i><i class="me" style="left:${e.total / mx * 100}%"></i></div>
+      <small>회색 띠: 34평 표준 올수리 6,100만~8,500만 원 (업체 자료 · 샷시·붙박이장 미포함 기준이 많음). 고급 자재·구조 변경 시 1억 원 이상</small></div>
+      <label class="tg sm"><input type="checkbox" id="vat" ${state.vat ? 'checked' : ''}><span></span><div>부가세 10% 포함</div></label>
+      <button class="btn" id="copyTsv">견적표 복사 (엑셀 붙여넣기용)</button>
+    </section>
+    <section><table class="est"><thead><tr><th>공정 / 항목</th><th>물량</th><th>금액</th></tr></thead><tbody>
+    ${order.filter(c => cats[c]).map(c => {
+      const s = cats[c].reduce((a, l) => a + l.amt, 0);
+      return `<tr class="cat"><td>${c}</td><td></td><td>${man(s)}</td></tr>` + cats[c].map(l => `<tr><td>${l.name}<small>${l.item || ''}</small></td><td>${l.q.toFixed(l.unit === '식' || l.unit === '짝' || l.unit === '개소' ? 0 : 1)}${l.unit}</td><td>${won(l.amt)}</td></tr>`).join('');
+    }).join('')}
+    <tr class="cat"><td>소계</td><td></td><td>${won(e.sub)}</td></tr>
+    <tr><td>현장관리·디자인비 (${MGMT_RATE * 100}%)</td><td></td><td>${won(e.mg)}</td></tr>
+    ${state.vat ? `<tr><td>부가세 10%</td><td></td><td>${won(e.vat)}</td></tr>` : ''}
+    <tr class="tot"><td>합계</td><td></td><td>${won(e.total)}</td></tr></tbody></table>
+    <p class="note">※ 단가는 시공비를 포함한 2026년 개략 추정치입니다. 물량은 3D 모델에서 자동으로 산출했어요(바닥은 중심선 면적×0.92). 시스템에어컨·가전·조명기구 본체·이사비는 빠져 있습니다. 실측 견적 3곳 이상과 비교해 보세요.</p></section>`;
+  $('#vat').onchange = ev => { state.vat = ev.target.checked; saveState(); renderEstimate(); updateTotal(); };
+  $('#copyTsv').onclick = async () => {
+    const rows = [['공정', '항목', '선택 자재/비고', '물량', '단위', '단가', '금액'], ...e.lines.map(l => [l.cat, l.name, l.item, l.q.toFixed(2), l.unit, Math.round(l.price), Math.round(l.amt)]), ['', '현장관리·디자인비', '', '', '', '', Math.round(e.mg)], ['', '부가세', '', '', '', '', Math.round(e.vat)], ['', '합계', '', '', '', '', Math.round(e.total)]];
+    try { await navigator.clipboard.writeText(rows.map(r => r.join('\t')).join('\n')); toast('견적표를 복사했어요. 엑셀에 붙여넣으세요'); } catch (er) { toast('이 환경에서는 클립보드 복사가 막혀 있어요'); }
+  };
+}
+
+function renderPlan() {
+  const c = CONCEPTS.find(c => c.id === state.concept);
+  const e = estimate();
+  const rows = Object.keys(CATALOG).map(s => { const it = resolveItem(s), cc = CATALOG[s]; return `<tr><td>${cc.zone}</td><td>${cc.label}</td><td><i class="dot" style="background:${/^#/.test(it.color) ? it.color : '#ccc'}"></i>${it.name}<small>${it.spec}</small></td><td>${/^#/.test(it.color) ? it.color : '—'}</td></tr>`; }).join('');
+  const area = ROOMS.filter(r => !r.nolabel).map(r => { const a = (r.x2 - r.x1) * (r.z2 - r.z1) / 1e6; return `<tr><td>${r.name}</td><td>${((r.x2 - r.x1) / 1000).toFixed(2)} × ${((r.z2 - r.z1) / 1000).toFixed(2)}m</td><td>${a.toFixed(1)}㎡</td></tr>`; }).join('');
+  $('#pane').innerHTML = `<article class="doc">
+    <h2>33평형 전체 리모델링 기획서</h2><p class="meta">${PLAN_META.name} · 공급 ${PLAN_META.supply}㎡ / 전용 ${PLAN_META.exclusive}㎡ · 2026.11 작성</p>
+    <h3>1. 프로젝트 개요</h3>
+    <table><tr><th>대상</th><td>3Bay 판상형 · 방 3 / 욕실 2 · 저층(1~6층)/19층</td></tr>
+    <tr><th>범위</th><td>전체 철거 후 전 공정 리모델링 (샷시·욕실·주방·바닥·도배·조명·가구)</td></tr>
+    <tr><th>현재 컨셉</th><td>${c ? c.name : '사용자 지정 조합'}</td></tr>
+    <tr><th>예상 공사비</th><td>${man(e.total)}원 (평당 ${man(e.total / 33)}원, 추정)</td></tr></table>
+    <div class="callout"><b>사수의 한마디</b> 매매가(2억 5,000만 원) 기준으로 이 공사비는 집값의 ${Math.round(e.total / 2.5e8 * 100)}% 수준이에요. 실거주를 5년 이상 할 계획이 아니라면 샷시와 욕실·주방 같은 '바꾸기 어려운 공정'에 예산을 몰고, 도어 필름 리폼·실크벽지·강마루처럼 단가를 낮출 수 있는 항목은 등급을 조절하는 걸 권해요.</div>
+    <h3>2. 2026 트렌드 인사이트</h3>
+    <ul>
+      <li><b>화이트 회귀 + 웜 뉴트럴</b> — Pantone 2026은 첫 화이트 컬러 <i class="dot" style="background:#F0EEE9"></i>Cloud Dancer(11-4201). BM은 딥 브라운 <i class="dot" style="background:#57504C"></i>Silhouette, SW는 <i class="dot" style="background:#B8A992"></i>Universal Khaki를 골랐어요. 쿨 그레이에서 웜 톤으로 넘어가는 흐름입니다.</li>
+      <li><b>3무 인테리어</b> — 무몰딩·무문선·무걸레받이로 선을 지우고 면을 강조합니다(세계일보 2026.06). 대신 벽과 바닥 수평이 정밀해야 해서 숙련 시공팀이 필요해요.</li>
+      <li><b>광폭 우드</b> — 동화자연마루가 초광폭 강마루를 리뉴얼했고(2026.04), 한샘 165 강마루는 2분기 매출이 98% 늘었어요(2026.07). 밝은 오크에서 월넛·티크 쪽으로 옮겨가는 흐름도 일부 있습니다.</li>
+      <li><b>원톤 & 빅슬랩</b> — 벽·천장·몰딩·도어 색을 맞추는 원톤(현대리바트), 세라믹 상판과 슬랩 백스플래시, 대형 포세린 욕실이 늘고 있어요.</li>
+      <li><b>소프트 미니멀 & 레이어드 조명</b> — 질감 있는 마감(라임워시·패브릭·템바)과 간접조명 위주의 따뜻한 색온도가 쓰입니다.</li>
+    </ul>
+    <h3>3. 공간 계획</h3>
+    <ul>
+      <li><b>안방 존</b> — 안방 앞 전실(2.6×1.9m)을 ${state.dress ? '드레스룸으로 구획하고 아치 개구부로 안방과 연결해, 욕실1을 안방 전용(부부욕실)으로 씁니다' : '원평면대로 복도형 전실로 유지합니다'}.</li>
+      <li><b>LDK</b> — 주방은 ㄱ자 하부장 + 서측 키큰장(냉장고장)으로 구성하고, 식탁 위에 펜던트 2구를 둡니다. 거실 TV벽(W 3.8m)이 아트월이에요. ${state.expand ? '거실 발코니를 확장해 거실 깊이가 6.2m가 됩니다.' : '거실 발코니는 비확장으로 두고 홈카페·화분 존으로 씁니다.'}</li>
+      <li><b>현관</b> — 120mm 단차, 천장까지 닿는 신발장 + LED 오픈 니치, ${itemOf('jungmun').panels ? itemOf('jungmun').name + ' 중문' : '중문 없음'}.</li>
+      <li><b>욕실</b> — 욕실1은 샤워부스(욕조 철거)와 벽걸이 변기, 욕실2는 욕조를 유지하고 니치 간접조명을 넣습니다.</li>
+    </ul>
+    <table class="small"><thead><tr><th>실명</th><th>치수(중심선)</th><th>면적</th></tr></thead><tbody>${area}</tbody></table>
+    <h3>4. 마감재 스펙 (현재 선택)</h3>
+    <table class="small"><thead><tr><th>구역</th><th>항목</th><th>자재·사양</th><th>컬러</th></tr></thead><tbody>${rows}</tbody></table>
+    <h3>5. 조명 계획</h3>
+    <ul><li>거실: 매립 다운라이트 6구 ${state.cove ? '+ 우물천장 간접조명' : ''}, 주방: 펜던트 2구 + 상부장 하부 LED, 복도: 라인조명, 욕실: 니치 LED.</li>
+    <li>색온도: 거실·침실은 2700~3000K, 주방 작업면은 3500~4000K를 권장합니다. <small>(업계 관행 기준이며 검증된 값은 아님)</small> 현재 시뮬레이션은 ${state.kelvin}K예요.</li></ul>
+    <h3>6. 공정 일정 (약 7주)</h3>
+    <table class="small"><tr><th>1주</th><td>관리사무소 신고·동의서, 보양, 철거, 폐기물 반출</td></tr>
+    <tr><th>2주</th><td>${state.sash ? '샷시 교체, ' : ''}설비·전기 배선, ${state.expand ? '확장부 단열·난방 연장, ' : ''}욕실 방수 + 48시간 담수 테스트</td></tr>
+    <tr><th>3주</th><td>목공: 천장 평탄화, 무몰딩 디테일, 문틀, ${state.dress ? '드레스룸 가벽, ' : ''}커튼박스</td></tr>
+    <tr><th>4주</th><td>타일(욕실·현관·주방 백스플래시·발코니), 아트월</td></tr>
+    <tr><th>5주</th><td>도장·도배, 필름</td></tr>
+    <tr><th>6주</th><td>마루 시공, 주방·붙박이장·신발장 설치, 도어·중문</td></tr>
+    <tr><th>7주</th><td>조명기구·스위치, 실리콘·마감, 입주청소, 하자 점검</td></tr></table>
+    <h3>7. 리스크 체크리스트</h3>
+    <ul class="check"><li>공동주택 행위허가: 발코니 확장·비내력벽 철거 전에 관리주체에 확인</li><li>3무 디테일은 시공팀 포트폴리오로 미리 검증 (수평 오차 2mm 이내)</li><li>대형 포세린(600×1200 이상)은 운반·재단 할증과 덧방 가능 여부 확인</li><li>샷시 리드타임 3~4주 → 계약 즉시 발주</li><li>화면 색상은 실제와 다를 수 있으니 최종 자재는 실물 샘플로 확정</li></ul>
+    <h3>출처</h3><ol class="src">${SOURCES.map(([t, u]) => `<li><a href="${u}" target="_blank" rel="noopener">${t}</a></li>`).join('')}</ol>
+    <p class="note">※ 평면 치수는 매물 도면(11,970 × 15,515mm)을 근거로 모델링했어요. 실 구획은 도면 판독에 따른 추정이라 실측으로 확인이 필요해요. 일부 트렌드 항목(재패니디·SPC 등)은 국내 2026 공식 근거를 찾지 못해 넣지 않았어요.</p>
+  </article>`;
+}
+
+function render(focusSlot) {
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.t === tab));
+  ({ concept: renderConcept, finish: renderFinish, estimate: renderEstimate, plan: renderPlan })[tab](focusSlot);
+}
+function updateTotal() { const e = estimate(); $('#totalChip').innerHTML = `예상 <b>${man(e.total)}원</b>`; }
+
+// ---------- 이벤트 연결 ----------
+document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => { tab = b.dataset.t; render(); $('#pane').scrollTop = 0; });
+document.querySelectorAll('#views button').forEach(b => b.onclick = () => setView(b.dataset.v));
+window.onViewChange = () => {
+  document.querySelectorAll('#views button').forEach(b => b.classList.toggle('on', b.dataset.v === state.view));
+};
+window.onSlotPick = (slot, room) => {
+  tab = 'finish'; zone = CATALOG[slot].zone; render(slot); flashSlot(slot);
+  const r = ROOMS.find(r => r.id === room); toast(`${r ? r.name + ' · ' : ''}${CATALOG[slot].label}`);
+};
+window.onRoomPick = id => { if (state.view === 'walk') goSpot(id); };
+const roomSel = $('#roomSel');
+roomSel.innerHTML = Object.keys(SPOTS).map(k => `<option value="${k}">${(getRooms(state).find(r => r.id === k) || {}).name || k}</option>`).join('');
+roomSel.onchange = () => goSpot(roomSel.value);
+document.querySelectorAll('#pad button').forEach(b => {
+  const k = b.dataset.k;
+  const on = e => { e.preventDefault(); walk.keys[k] = true; }, off = () => { walk.keys[k] = false; };
+  b.addEventListener('pointerdown', on); b.addEventListener('pointerup', off); b.addEventListener('pointerleave', off); b.addEventListener('pointercancel', off);
+});
+$('#snap').onclick = () => { $('#shotImg').src = snapshot(); $('#shot').classList.add('on'); };
+$('#shot').onclick = e => { if (e.target.id !== 'shotImg') $('#shot').classList.remove('on'); };
+
+// ---------- 시작 ----------
+applyAll(); build(); render(); updateTotal(); window.onViewChange();
+requestAnimationFrame(loop);
+setTimeout(() => $('#loading').classList.add('off'), 200);
+window.SIM = { state, setView, goSpot, applyLighting, build, applyConcept, estimate };
+
+</script>
+</body>
+</html>

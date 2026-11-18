@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>33평 전체 인테리어 3D 시뮬레이터 · 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/*__CSS__*/
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="brand"><b>33평 리모델링 시뮬레이터</b><span>화정마을4단지 아이파크가야 · 84㎡ · 2026 트렌드</span></div>
+    <div id="views" class="seg"><button data-v="orbit">조감</button><button data-v="top">평면</button><button data-v="walk">워크스루</button></div>
+    <div class="hr"><span id="totalChip"></span><button id="snap" class="btn ghost" title="현재 화면 이미지">📷</button></div>
+  </header>
+  <main>
+    <div id="viewport">
+      <div id="labels"></div>
+      <div id="walkHud">
+        <select id="roomSel" aria-label="공간 이동"></select>
+        <p>드래그: 둘러보기 · W/A/S/D·방향키: 이동 · Shift: 빠르게</p>
+        <div id="pad"><button data-k="w">▲</button><button data-k="q">⟲</button><button data-k="s">▼</button><button data-k="e">⟳</button></div>
+      </div>
+      <div id="toast"></div>
+      <div id="loading"><div class="spin"></div><p>3D 모델과 자재 텍스처를 만들고 있어요…</p></div>
+    </div>
+    <aside>
+      <nav id="tabs"><button data-t="concept">컨셉·옵션</button><button data-t="finish">마감재</button><button data-t="estimate">견적</button><button data-t="plan">기획서</button></nav>
+      <div id="pane"></div>
+    </aside>
+  </main>
+</div>
+<div id="shot"><div><img id="shotImg" alt="스냅샷"><p>이미지를 길게 누르거나 우클릭해서 저장하세요 · 바깥을 누르면 닫혀요</p></div></div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+/*__JS__*/
+</script>
+</body>
+</html>
